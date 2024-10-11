@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { Link } from "react-router-dom" ;
+import AuthContext from '../context/AuthContext';
 
 const OffreList = () => {
     const [offres, setOffres] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { isAdmin } = useContext(AuthContext);
 
     useEffect(() => {
         const fetchOffres = async () => {
             const response = await fetch('http://127.0.0.1:8000/api/offres/');
             const data = await response.json();
+            console.log(data);
             setOffres(data);
             setLoading(false);
         };
@@ -28,6 +32,13 @@ const OffreList = () => {
                         <h2>{offre.nom_offre}</h2>
                         <p>Prix: {offre.prix} $</p>
                         <p>Description: {offre.description}</p>
+                        {isAdmin && (
+                            <>
+                                <Link to={`/offre/edit/${offre.id}`}>
+                                    Modifier
+                                </Link>
+                            </>
+                        )}
                     </li>
                 ))}
             </ul>

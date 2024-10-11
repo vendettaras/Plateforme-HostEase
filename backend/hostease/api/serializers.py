@@ -61,5 +61,5 @@ class EntrepriseSerializer(serializers.ModelSerializer):
 class OffreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offre
-        fields = ['nom_offre', 'prix', 'description']
+        fields = ['id', 'nom_offre', 'prix', 'description']
 

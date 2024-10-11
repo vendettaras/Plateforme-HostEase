@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage';
 import Header from './components/Header';
 import OffreList from './pages/OffreList';
 import OffreCreate from './pages/OffreCreate';
+import OffreEdit from './pages/OffreEdit';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/offre-list" element={<OffreList />} />
               <Route path="/create-offre" element={<OffreCreate />} />
+              <Route path="/offre/edit/:id" element={<OffreEdit />} />
             </Routes>
           </AuthProvider>
         </Router>

@@ -3,9 +3,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework import viewsets
+from rest_framework.generics import RetrieveUpdateAPIView
 
 from rest_framework_simplejwt.views import TokenObtainPairView
+
+import logging
 
 
 from rest_framework import generics
@@ -34,8 +36,6 @@ class OffreCreate(APIView):
     permission_classes = [IsAdminUser]
 
     def post(self, request):
-        print("Authorization header:", request.headers.get('Authorization'))
-        print("User info:", request.user)
         
         serializer = OffreSerializer(data=request.data)
         if serializer.is_valid():
@@ -43,6 +43,21 @@ class OffreCreate(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class OffreUpdateView(RetrieveUpdateAPIView):
+    permission_classes = [IsAdminUser]
+    queryset = Offre.objects.all()
+    serializer_class = OffreSerializer
+    lookup_field = 'pk'
+
+    def get(self, request, *args, **kwargs):
+        logger = logging.getLogger(__name__)
+        logger.info(f"User: {request.user}, trying to access OffreUpdateView")
+        return super().get(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        logger = logging.getLogger(__name__)
+        logger.info(f"User: {request.user}, trying to update offre {kwargs['pk']}")
+        return super().put(request, *args, **kwargs)
 
 
 @api_view(['GET'])
