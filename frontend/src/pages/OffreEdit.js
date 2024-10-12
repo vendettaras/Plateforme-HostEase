@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 
 const OffreEdit = () => {
     const { id } = useParams(); // Récupère l'ID depuis l'URL
     const navigate = useNavigate();
-    const { updateToken, authTokens, user } = useContext(AuthContext); // Récupère les tokens et updateToken depuis le contexte
+    const { authTokens, updateToken, user } = useContext(AuthContext); // Inclut updateToken
 
     const [offer, setOffer] = useState({
         nom_offre: '',
@@ -13,12 +13,11 @@ const OffreEdit = () => {
         description: ''
     });
 
-    // Récupération des données de l'offre
     useEffect(() => {
 
         const fetchOffer = async () => {
             try {
-                console.log(`Fetching offer with ID: ${id}`); // Ajoutez ce log
+                // console.log(`Fetching offer with ID: ${id}`); // Ajoutez ce log
                 const response = await fetch(`http://127.0.0.1:8000/api/offre/${id}/`, {
                     method: 'GET',
                     headers: {
@@ -27,11 +26,11 @@ const OffreEdit = () => {
             },
                 });
                 
-                console.log('Response status:', response.status); // Log du statut de la réponse
+                // console.log('Response status:', response.status); // Log du statut de la réponse
                 
                 if (response.ok) {
                     let data = await response.json();
-                    console.log('Fetched data:', data); // Log des données récupérées
+                    // console.log('Fetched data:', data); // Log des données récupérées
                     setOffer(data);
                 } else {
                     console.error('Erreur lors de la récupération de l\'offre');
@@ -45,9 +44,8 @@ const OffreEdit = () => {
         if (id) { // S'assurer que l'ID est défini avant de faire l'appel à l'API
             fetchOffer();
         }
-    }, [id]);
+    }, [id, authTokens]);
 
-    // Gestion de la soumission du formulaire
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -86,6 +84,32 @@ const OffreEdit = () => {
         });
     };
 
+    // Fonction pour supprimer l'offre
+    const handleDelete = async () => {
+        const confirmDelete = window.confirm("Êtes-vous sûr de vouloir supprimer cette offre ?");
+        if (confirmDelete) {
+            // Mise à jour du token si nécessaire
+            if (updateToken) {
+                await updateToken();
+            }
+    
+            const response = await fetch(`http://127.0.0.1:8000/api/offre/${id}/delete/`, {  // Modifié ici
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${authTokens?.access}`
+                },
+            });
+    
+            if (response.ok) {
+                console.log("Offre supprimée avec succès");
+                navigate('/offre-list'); // Redirige vers la liste des offres après suppression
+            } else {
+                console.error('Erreur lors de la suppression de l\'offre');
+            }
+        }
+    };
+    
+
     return (
         <div>
             <h1>Modifier l'offre</h1>
@@ -107,6 +131,7 @@ const OffreEdit = () => {
                     </label>
                     <br />
                     <button type="submit">Modifier</button>
+                    <button type="button" onClick={handleDelete}>Supprimer l'offre</button>
                 </form>
             ) : (
                 <p>Vous devez être un administrateur pour modifier une offre.</p>

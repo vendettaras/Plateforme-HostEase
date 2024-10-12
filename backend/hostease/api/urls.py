@@ -1,5 +1,13 @@
 from django.urls import path
-from .views import EntrepriseCreateView, getRoutes, MyTokenObtainPairView, OffreList, OffreCreate, OffreUpdateView
+from .views import (
+    EntrepriseCreateView, 
+    getRoutes, 
+    MyTokenObtainPairView, 
+    OffreList, 
+    OffreCreate, 
+    OffreUpdateView,
+    OffreDeleteView,
+    )
 
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
@@ -14,5 +22,6 @@ urlpatterns = [
     path('offres/', OffreList.as_view(), name='offre-list'),
     path('offre/create/', OffreCreate.as_view(), name='offre-create'),
     path('offre/<int:pk>/', OffreUpdateView.as_view(), name='offre-update'),
+    path('offre/<int:pk>/delete/', OffreDeleteView.as_view(), name='offre-delete'),
 
 ]

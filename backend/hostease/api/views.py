@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, DestroyAPIView
 
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -58,6 +58,21 @@ class OffreUpdateView(RetrieveUpdateAPIView):
         logger = logging.getLogger(__name__)
         logger.info(f"User: {request.user}, trying to update offre {kwargs['pk']}")
         return super().put(request, *args, **kwargs)
+    
+
+class OffreDeleteView(DestroyAPIView):
+    permission_classes = [IsAdminUser]  # Seuls les administrateurs peuvent supprimer
+    queryset = Offre.objects.all()
+    serializer_class = OffreSerializer
+    lookup_field = 'pk'
+
+    def delete(self, request, pk):
+        try:
+            offre = Offre.objects.get(pk=pk)
+            offre.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Offre.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])

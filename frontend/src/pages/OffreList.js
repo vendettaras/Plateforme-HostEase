@@ -11,7 +11,7 @@ const OffreList = () => {
         const fetchOffres = async () => {
             const response = await fetch('http://127.0.0.1:8000/api/offres/');
             const data = await response.json();
-            console.log(data);
+            // console.log(data);
             setOffres(data);
             setLoading(false);
         };
