@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 const InscriptionUtilisateur = ({ onUserCreated }) => {
   const [email, setEmail] = useState('');
   const [nom, setNom] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,7 +28,6 @@ const InscriptionUtilisateur = ({ onUserCreated }) => {
         const data = await response.json();
         console.log("Utilisateur créé avec succès", data);
         onUserCreated(data.id);  // Transmet l'ID de l'utilisateur pour la prochaine étape
-        navigate('/');
       } else {
         const errorData = await response.json();
         console.error("Erreur lors de la création de l'utilisateur:", errorData);

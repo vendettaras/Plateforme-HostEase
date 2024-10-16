@@ -17,6 +17,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['email'] = user.email  # Ajoute l'email de l'utilisateur au token
         token['nom'] = user.nom  # Ajoute le nom de l'utilisateur au token
         token['is_staff'] = user.is_staff
+        token['id'] = user.id
 
         return token
 

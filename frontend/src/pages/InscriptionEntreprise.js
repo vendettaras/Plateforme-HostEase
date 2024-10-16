@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const InscriptionEntreprise = ({ userId }) => {
   const [nomEntreprise, setNomEntreprise] = useState('');
@@ -8,6 +9,8 @@ const InscriptionEntreprise = ({ userId }) => {
   const [localisation, setLocalisation] = useState('');
   const [proprio, setProprio] = useState('');
   const [logo, setLogo] = useState(null);
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,6 +36,7 @@ const InscriptionEntreprise = ({ userId }) => {
         console.error("Erreur lors de la création de l'entreprise:", data);
       } else {
         console.log("Entreprise créée avec succès");
+        navigate('/');
       }
     } catch (error) {
       console.error("Erreur:", error);

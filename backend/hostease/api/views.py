@@ -1,36 +1,36 @@
-from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.generics import RetrieveUpdateAPIView, DestroyAPIView
-from django.utils import timezone
+from rest_framework.generics import RetrieveUpdateAPIView, DestroyAPIView, UpdateAPIView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticated, BasePermission
 
-from rest_framework_simplejwt.tokens import RefreshToken
-
-from django.views.decorators.csrf import csrf_exempt
-
-from django.contrib.auth import get_user_model
-
-from rest_framework_simplejwt.views import TokenObtainPairView
-
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 import logging
 
-
-from rest_framework import generics
-from rest_framework.permissions import IsAdminUser, AllowAny
 from .serializers import (
     InfoEntrepriseSerializer, 
     OffreSerializer, 
     CustomTokenObtainPairSerializer,
     CustomUserSerializer,
     )
+from hostease.models import (
+    CustomUser, 
+    InfoEntreprise, 
+    Offre,
+  )  
 
+class IsOwner(BasePermission):
+    """
+    Permission qui ne permet aux utilisateurs de modifier que leurs propres objets.
+    """
 
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, ValidationError
-from hostease.models import CustomUser, InfoEntreprise, Offre  # Assurez-vous que cela correspond à votre modèle
-from rest_framework_simplejwt.views import TokenRefreshView
+    def has_object_permission(self, request, view, obj):
+        # Vérifie si l'utilisateur est le propriétaire de l'objet
+        return obj.user == request.user
     
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -73,6 +73,21 @@ class InscriptionEntrepriseView(APIView):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class InfoEntrepriseUpdateView(RetrieveUpdateAPIView):
+    queryset = InfoEntreprise.objects.all()
+    serializer_class = InfoEntrepriseSerializer
+    permission_classes = [IsAuthenticated, IsOwner]  # Assurez-vous que les deux permissions sont là
+    lookup_field = 'pk'
+
+    def get(self, request, *args, **kwargs):
+        logger = logging.getLogger(__name__)
+        logger.info(f"User: {request.user}, trying to access InfoEntrepriseUpdateView")
+        return super().get(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        logger = logging.getLogger(__name__)
+        logger.info(f"User: {request.user}, trying to update entreprise {kwargs['pk']}")
+        return super().update(request, *args, **kwargs)
 
 class OffreList(APIView):
     permission_classes = [AllowAny]
@@ -80,6 +95,14 @@ class OffreList(APIView):
     def get(self, request):
         offres = Offre.objects.all()
         serializer = OffreSerializer(offres, many=True)
+        return Response(serializer.data)
+    
+class InfoEntrepriseList(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        infoEntreprise = InfoEntreprise.objects.all()
+        serializer = InfoEntrepriseSerializer(infoEntreprise, many=True)
         return Response(serializer.data)
 
 
