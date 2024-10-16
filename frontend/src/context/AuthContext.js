@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                'mail': e.target.mail.value,
+                'email': e.target.email.value,
                 'password': e.target.password.value,
             }),
         });
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('authTokens', JSON.stringify(data));
             navigate('/');
         } else {
-            alert('Something went wrong!');
+            alert('Erreur : ' + data.detail); // Affiche l'erreur de l'API
         }
     };
 

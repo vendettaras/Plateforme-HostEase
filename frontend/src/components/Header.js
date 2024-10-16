@@ -21,8 +21,9 @@ const Header = () => {
                 </>
             ) : (
                 <Link to="/login">Login</Link>
+                
             )}
-            {user && <p>Hello {user.mail}</p>} {/* Affichez l'email ou le nom de l'utilisateur */}
+            {user && <p>Hello {user.nom}</p>} {/* Affichez l'email ou le nom de l'utilisateur */}
         </div>
     );
 };

@@ -11,6 +11,8 @@ import Header from './components/Header';
 import OffreList from './pages/OffreList';
 import OffreCreate from './pages/OffreCreate';
 import OffreEdit from './pages/OffreEdit';
+import InscriptionFlow from './pages/InscriptionFlow';
+
 
 function App() {
   return (
@@ -25,6 +27,7 @@ function App() {
               <Route path="/offre-list" element={<OffreList />} />
               <Route path="/create-offre" element={<OffreCreate />} />
               <Route path="/offre/edit/:id" element={<OffreEdit />} />
+              <Route path="/inscription" element={<InscriptionFlow />} />
             </Routes>
           </AuthProvider>
         </Router>

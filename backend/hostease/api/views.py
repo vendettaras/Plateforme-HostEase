@@ -4,24 +4,75 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateAPIView, DestroyAPIView
+from django.utils import timezone
+
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from django.views.decorators.csrf import csrf_exempt
+
+from django.contrib.auth import get_user_model
 
 from rest_framework_simplejwt.views import TokenObtainPairView
+
 
 import logging
 
 
 from rest_framework import generics
 from rest_framework.permissions import IsAdminUser, AllowAny
-from hostease.models import Entreprise, Offre
-from .serializers import EntrepriseSerializer, OffreSerializer, MyTokenObtainPairSerializer
+from .serializers import (
+    InfoEntrepriseSerializer, 
+    OffreSerializer, 
+    CustomTokenObtainPairSerializer,
+    CustomUserSerializer,
+    )
 
+
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, ValidationError
+from hostease.models import CustomUser, InfoEntreprise, Offre  # Assurez-vous que cela correspond à votre modèle
+from rest_framework_simplejwt.views import TokenRefreshView
     
-class MyTokenObtainPairView(TokenObtainPairView) :
-    serializer_class = MyTokenObtainPairSerializer
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
-class EntrepriseCreateView(generics.CreateAPIView):
-    queryset = Entreprise.objects.all()
-    serializer_class = EntrepriseSerializer
+class CustomTokenRefreshView(TokenRefreshView):
+    permission_classes = [AllowAny]
+
+class InscriptionUserView(APIView):
+    def post(self, request):
+        serializer = CustomUserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()  # Enregistre l'utilisateur
+            return Response({
+                "id": user.id,  # Retourne l'ID de l'utilisateur pour la suite de l'inscription
+                "message": "Utilisateur créé avec succès"
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# views.py
+
+class InscriptionEntrepriseView(APIView):
+    def post(self, request):
+        user_id = request.data.get('user_id')  # ID de l'utilisateur envoyé depuis React
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            if user.role != 'entreprise':
+                return Response({"error": "Cet utilisateur n'est pas une entreprise"}, status=status.HTTP_400_BAD_REQUEST)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "Utilisateur non trouvé"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Associe l'utilisateur à l'entreprise dans InfoEntreprise
+        request.data['user'] = user.id  # Associe l'utilisateur à l'entreprise
+        serializer = InfoEntrepriseSerializer(data=request.data)
+        if serializer.is_valid():
+            entreprise = serializer.save()
+            return Response({
+                "message": "Entreprise créée avec succès",
+                "entreprise_id": entreprise.id
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class OffreList(APIView):
     permission_classes = [AllowAny]

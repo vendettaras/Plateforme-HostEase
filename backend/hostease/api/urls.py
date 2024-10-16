@@ -1,24 +1,23 @@
 from django.urls import path
 from .views import (
-    EntrepriseCreateView, 
     getRoutes, 
-    MyTokenObtainPairView, 
     OffreList, 
     OffreCreate, 
     OffreUpdateView,
     OffreDeleteView,
+    CustomTokenObtainPairView,
+    CustomTokenRefreshView,
+    InscriptionEntrepriseView,
+    InscriptionUserView,
     )
-
-from rest_framework_simplejwt.views import (
-    TokenRefreshView,
-)
 
 urlpatterns = [
     path('', getRoutes),
 
-    path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('entreprises/', EntrepriseCreateView.as_view(), name='entreprise-create'),
+    path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
+    path('register-user/', InscriptionUserView.as_view(), name='register_user'),
+    path('register-entreprise/', InscriptionEntrepriseView.as_view(), name='register_entreprise'),
     path('offres/', OffreList.as_view(), name='offre-list'),
     path('offre/create/', OffreCreate.as_view(), name='offre-create'),
     path('offre/<int:pk>/', OffreUpdateView.as_view(), name='offre-update'),
