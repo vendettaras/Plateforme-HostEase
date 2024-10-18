@@ -8,9 +8,11 @@ const Header = () => {
     return (
         <div>
             <Link to="/">Accueil</Link>
+            <span> || </span>
             <Link to="/offre-list">Offres</Link>
+            <span> || </span>
             <Link to="/Entreprise-list">Entreprises</Link>
-            <span> | </span>
+            <span> || </span>
             {user ? (
                 <>
                     <button onClick={logoutUser}>Logout</button>

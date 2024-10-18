@@ -63,7 +63,7 @@ class InfoEntreprise(models.Model):
     stat = models.CharField(max_length=30, null=True)
     localisation = models.CharField(max_length=50, null=True)
     proprio = models.CharField(max_length=50, null=True)
-    logo = models.ImageField(blank=True, upload_to='media/logo/')
+    logo = models.ImageField(blank=True, upload_to='logo/')
     nb_avis = models.IntegerField(default=0)
     nb_client = models.IntegerField(default=0)
     nb_partenaire = models.IntegerField(default=0)

@@ -5,6 +5,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from hostease.models import InfoEntreprise, Offre, CustomUser
 
 from django.utils import timezone
+from backend import settings
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -37,6 +38,14 @@ class InfoEntrepriseSerializer(serializers.ModelSerializer):
     class Meta:
         model = InfoEntreprise
         fields = '__all__'
+
+    def update(self, instance, validated_data):
+        # Mettre à jour tous les champs sauf 'logo' s'il n'est pas dans validated_data
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
 
 class OffreSerializer(serializers.ModelSerializer):
     class Meta:

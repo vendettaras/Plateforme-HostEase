@@ -14,6 +14,7 @@ import OffreEdit from './pages/OffreEdit';
 import InscriptionFlow from './pages/InscriptionFlow';
 import InfoEntrepriseEdit from './pages/InfoEntrepriseEdit';
 import EntrepriseList from './pages/EntrepriseList';
+import EntrepriseDetail from './pages/EntrepriseDetail';
 
 
 function App() {
@@ -24,7 +25,6 @@ function App() {
           <AuthProvider>
             <Header />
             <Routes>
-              {/* <Route path="/" element={<PrivateRoute element={<HomePage />} />} /> */}
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/offre-list" element={<OffreList />} />
@@ -33,6 +33,7 @@ function App() {
               <Route path="/inscription" element={<InscriptionFlow />} />
               <Route path="/entreprise/:id/modifier" element={<InfoEntrepriseEdit />} />
               <Route path="/entreprise-list" element={<EntrepriseList />} />
+              <Route path="/entreprise/:id" element={<EntrepriseDetail />} />
             </Routes>
           </AuthProvider>
         </Router>

@@ -3,9 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 
 const InfoEntrepriseEdit = () => {
-    const { id } = useParams(); // Récupère l'ID depuis l'URL
+    const { id } = useParams();
     const navigate = useNavigate();
-    const { authTokens, updateToken, user } = useContext(AuthContext); // Inclut updateToken
+    const { authTokens, user } = useContext(AuthContext);
 
     const [entreprise, setEntreprise] = useState({
         nom_entreprise: '',
@@ -18,6 +18,8 @@ const InfoEntrepriseEdit = () => {
         logo: '',
     });
 
+    const [logoMessage, setLogoMessage] = useState('');
+
     useEffect(() => {
         const fetchEntreprise = async () => {
             try {
@@ -25,7 +27,7 @@ const InfoEntrepriseEdit = () => {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authTokens?.access}` // Utilise le token d'accès
+                        'Authorization': `Bearer ${authTokens?.access}`
                     },
                 });
 
@@ -45,37 +47,69 @@ const InfoEntrepriseEdit = () => {
         }
     }, [id, authTokens]);
 
-    const handleSubmit = async (e) => {
+    const handleSubmitInfo = async (e) => {
         e.preventDefault();
 
-        // Mise à jour du token si nécessaire
-        if (updateToken) {
-            await updateToken();
-        }
+        const updatedData = {
+            nom_entreprise: entreprise.nom_entreprise,
+            nif: entreprise.nif,
+            stat: entreprise.stat,
+            mail: entreprise.mail,
+            contact: entreprise.contact,
+            localisation: entreprise.localisation,
+            proprio: entreprise.proprio,
+        };
 
         try {
             let response = await fetch(`http://127.0.0.1:8000/api/entreprise/${id}/modifier/`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authTokens?.access}` // Utilise le token d'accès pour l'autorisation
+                    'Authorization': `Bearer ${authTokens?.access}`,
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(entreprise),
+                body: JSON.stringify(updatedData),
             });
 
             if (response.ok) {
-                navigate('/info-entreprise-list'); // Redirige vers la liste des entreprises après modification
+                navigate(`/entreprise/${id}`); // Redirige vers la liste des entreprises
             } else {
                 const data = await response.json();
                 console.error('Error:', data);
-                alert(data.detail || 'Une erreur est survenue');
+                alert(data.detail || 'Une erreur est survenue lors de la mise à jour des informations.');
             }
         } catch (error) {
             console.error('Erreur lors de la mise à jour de l\'entreprise', error);
         }
     };
 
-    // Gestion des modifications du formulaire
+    const handleSubmitLogo = async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('logo', e.target.logo.files[0]);
+
+        try {
+            let response = await fetch(`http://127.0.0.1:8000/api/entreprise/${id}/modifier/`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${authTokens?.access}`,
+                },
+                body: formData,
+            });
+
+            if (response.ok) {
+                setLogoMessage('Logo mis à jour avec succès.'); // Affiche un message de succès
+                window.location.reload();
+            } else {
+                const data = await response.json();
+                console.error('Error:', data);
+                alert(data.detail || 'Une erreur est survenue lors de la mise à jour du logo.');
+            }
+        } catch (error) {
+            console.error('Erreur lors de la mise à jour du logo', error);
+        }
+    };
+
     const handleChange = (e) => {
         setEntreprise({
             ...entreprise,
@@ -83,36 +117,11 @@ const InfoEntrepriseEdit = () => {
         });
     };
 
-    // Fonction pour supprimer l'entreprise
-    const handleDelete = async () => {
-        const confirmDelete = window.confirm("Êtes-vous sûr de vouloir supprimer cette entreprise ?");
-        if (confirmDelete) {
-            // Mise à jour du token si nécessaire
-            if (updateToken) {
-                await updateToken();
-            }
-
-            const response = await fetch(`http://127.0.0.1:8000/api/info-entreprise/${id}/delete/`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${authTokens?.access}`
-                },
-            });
-
-            if (response.ok) {
-                console.log("Entreprise supprimée avec succès");
-                navigate('/info-entreprise-list'); // Redirige vers la liste des entreprises après suppression
-            } else {
-                console.error('Erreur lors de la suppression de l\'entreprise');
-            }
-        }
-    };
-
     return (
         <div>
             <h1>Modifier les informations de l'entreprise</h1>
-            {user?.id === entreprise.user ? ( // Vérifie si l'utilisateur est le propriétaire de l'entreprise
-                <form onSubmit={handleSubmit}>
+            {user?.id === entreprise.user ? (
+                <form onSubmit={handleSubmitInfo}>
                     <label>
                         Nom de l'entreprise:
                         <input type="text" name="nom_entreprise" value={entreprise.nom_entreprise} onChange={handleChange} />
@@ -148,17 +157,23 @@ const InfoEntrepriseEdit = () => {
                         <input type="text" name="proprio" value={entreprise.proprio} onChange={handleChange} />
                     </label>
                     <br />
-                    <label>
-                        Logo:
-                        <input type="text" name="logo" value={entreprise.logo} onChange={handleChange} />
-                    </label>
-                    <br />
-                    <button type="submit">Modifier</button>
-                    <button type="button" onClick={handleDelete}>Supprimer l'entreprise</button>
+                    <button type="submit">Modifier les informations</button>
                 </form>
             ) : (
                 <p>Vous n'avez pas les droits pour modifier ces informations.</p>
             )}
+
+            <h1>Modifier le logo de l'entreprise</h1>
+            <form onSubmit={handleSubmitLogo}>
+                <label>
+                    Logo:
+                    <img src={entreprise.logo} alt="Logo de l'entreprise" style={{ width: '100px', height: 'auto' }} />
+                    <input type="file" name="logo" accept="image/*" />
+                </label>
+                <br />
+                <button type="submit">Modifier le logo</button>
+            </form>
+            {logoMessage && <p>{logoMessage}</p>} {/* Affiche le message de succès */}
         </div>
     );
 };

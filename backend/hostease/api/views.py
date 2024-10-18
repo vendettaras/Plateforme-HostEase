@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.generics import RetrieveUpdateAPIView, DestroyAPIView, UpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, DestroyAPIView, RetrieveAPIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticated, BasePermission
 
@@ -53,6 +53,7 @@ class InscriptionUserView(APIView):
 # views.py
 
 class InscriptionEntrepriseView(APIView):
+    
     def post(self, request):
         user_id = request.data.get('user_id')  # ID de l'utilisateur envoyé depuis React
         try:
@@ -85,9 +86,21 @@ class InfoEntrepriseUpdateView(RetrieveUpdateAPIView):
         return super().get(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
-        logger = logging.getLogger(__name__)
-        logger.info(f"User: {request.user}, trying to update entreprise {kwargs['pk']}")
+    # Assigner automatiquement l'utilisateur connecté au champ 'user'
+        request.data['user'] = request.user.id
         return super().update(request, *args, **kwargs)
+    
+class EntrepriseDetailView(RetrieveAPIView):
+    queryset = InfoEntreprise.objects.all()
+    serializer_class = InfoEntrepriseSerializer
+    permission_classes = [AllowAny]  # Optionnel si vous souhaitez restreindre l'accès
+    lookup_field = 'pk'  # Pour utiliser l'ID de l'entreprise dans l'URL
+
+    def get(self, request, *args, **kwargs):
+        logger = logging.getLogger(__name__)
+        logger.info(f"User: {request.user}, accessing entreprise {kwargs['pk']} details")
+        return super().get(request, *args, **kwargs)
+
 
 class OffreList(APIView):
     permission_classes = [AllowAny]
