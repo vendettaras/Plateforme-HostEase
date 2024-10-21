@@ -145,6 +145,17 @@ class OffreUpdateView(RetrieveUpdateAPIView):
         logger = logging.getLogger(__name__)
         logger.info(f"User: {request.user}, trying to update offre {kwargs['pk']}")
         return super().put(request, *args, **kwargs)
+
+class OffreDetailView(RetrieveAPIView):
+    queryset = Offre.objects.all()
+    serializer_class = OffreSerializer
+    permission_classes = [AllowAny]  # Optionnel si vous souhaitez restreindre l'accès
+    lookup_field = 'pk'  # Pour utiliser l'ID de l'entreprise dans l'URL
+
+    def get(self, request, *args, **kwargs):
+        logger = logging.getLogger(__name__)
+        logger.info(f"User: {request.user}, accessing entreprise {kwargs['pk']} details")
+        return super().get(request, *args, **kwargs)
     
 
 class OffreDeleteView(DestroyAPIView):

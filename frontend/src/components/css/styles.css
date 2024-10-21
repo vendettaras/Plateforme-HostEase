@@ -1,0 +1,38 @@
+.header {
+    background-color: #000080;
+    height: 56px;
+    margin: 0;
+    padding: 0;
+    display: flex; /* Utilise flexbox pour aligner les éléments */
+    justify-content: space-between; /* Écarte les éléments */
+    align-items: center; /* Aligne verticalement les éléments au centre */
+    padding: 0 20px; /* Ajoute un peu d'espace à gauche et à droite */
+}
+
+.header .logo {
+    height: 50px; /* Ajustez la taille selon vos besoins */
+    margin-right: 50px; /* Espace entre l'image et les liens */
+}
+
+.header .links {
+    display: flex; /* Utilise flexbox pour les liens */
+    justify-content: center; /* Centre les liens */
+    flex-grow: 1; /* Permet à cette section de grandir pour occuper l'espace */
+}
+
+.header a {
+    color: #ffffff; /* Couleur des liens */
+    text-decoration: none; /* Supprime le soulignement */
+    margin-right: 15px; /* Espacement entre les liens */
+}
+
+.header a:hover {
+    color: #0099ff; /* Couleur au survol */
+}
+
+.header button {
+    color: #ffffff; /* Couleur du texte du bouton */
+    background: transparent; /* Fond transparent pour le bouton */
+    border: none; /* Supprime la bordure */
+    cursor: pointer; /* Change le curseur pour indiquer un bouton cliquable */
+}

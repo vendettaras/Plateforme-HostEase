@@ -2,6 +2,7 @@ from django.urls import path
 from .views import (
     getRoutes, 
     OffreList, 
+    OffreDetailView,
     OffreCreate, 
     OffreUpdateView,
     OffreDeleteView,
@@ -37,7 +38,8 @@ urlpatterns = [
 
     path('offres/', OffreList.as_view(), name='offre-list'),
     path('offre/create/', OffreCreate.as_view(), name='offre-create'),
-    path('offre/<int:pk>/', OffreUpdateView.as_view(), name='offre-update'),
+    path('offre/<int:pk>/', OffreDetailView.as_view(), name='offre-detail'),
+    path('offre/<int:pk>/modifier/', OffreUpdateView.as_view(), name='offre-update'),
     path('offre/<int:pk>/delete/', OffreDeleteView.as_view(), name='offre-delete'),
 
 ]

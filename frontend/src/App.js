@@ -15,6 +15,7 @@ import InscriptionFlow from './pages/InscriptionFlow';
 import InfoEntrepriseEdit from './pages/InfoEntrepriseEdit';
 import EntrepriseList from './pages/EntrepriseList';
 import EntrepriseDetail from './pages/EntrepriseDetail';
+import OffreDetail from './pages/OffreDetail';
 
 
 function App() {
@@ -29,11 +30,12 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/offre-list" element={<OffreList />} />
               <Route path="/create-offre" element={<OffreCreate />} />
-              <Route path="/offre/edit/:id" element={<OffreEdit />} />
+              <Route path="/offre/:id/modifier/" element={<OffreEdit />} />
               <Route path="/inscription" element={<InscriptionFlow />} />
               <Route path="/entreprise/:id/modifier" element={<InfoEntrepriseEdit />} />
               <Route path="/entreprise-list" element={<EntrepriseList />} />
               <Route path="/entreprise/:id" element={<EntrepriseDetail />} />
+              <Route path="/offre/:id" element={<OffreDetail />} />
             </Routes>
           </AuthProvider>
         </Router>

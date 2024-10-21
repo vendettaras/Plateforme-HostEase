@@ -1,0 +1,144 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Pour une gestion plus cohérente des dimensions */
+}
+
+.home-container {
+    margin: 0;
+    padding: 0;
+}
+
+.accueil {
+    margin: 0;
+    padding: 0;
+    background-color: #000080;
+    height: 90vh;
+    width: auto;
+}
+
+.logo1 {
+    margin-top: 20px;
+    margin-left: 100px;
+    height: 180px;
+    width: auto;
+}
+
+.bienvenue {
+    margin-left: 20px;
+    width: 480px;
+    line-height: 2;
+    color: #ffffff;
+    text-align: justify;
+}
+
+.suite {
+    background-color: #0099ff;
+    color: #ffffff;
+    width: 250px;
+    height: 40px;
+    border: none;
+    margin-top: 20px;
+    margin-left: 120px;
+}
+
+.custom-image {
+    margin: 60px;
+    height: 350px;
+    width: auto;
+}
+
+.pourquoi {
+    margin: 0;
+    padding: 0;
+    height: 95vh;
+    width: auto;
+}
+
+.pourquoi-hostease {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.text-wrapper {
+    font-weight: bold;
+    font-size: 30px;
+    color: #000080;
+}
+
+.text-wrapper-2 {
+    font-weight: bold;
+    font-size: 30px;
+    color: #0099ff;
+}
+
+.overlap {
+    margin-top: 20px;
+    margin-left: 50px;
+}
+
+.hostease-se {
+    margin-left: 20px;
+    width: 480px;
+    line-height: 2;
+    color: #000000;
+    text-align: justify;
+    font-size: 14px;
+}
+
+.undraw-tutorial {
+    height: 78vh;
+    width: auto;
+    margin-top: 30px;
+}
+
+.rectangle {
+    width: 140px;
+    height: 120px;
+    background-color: #0099ff;
+    border-radius: 20px;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    line-height: 2.5;
+    margin-top: 20px;
+    margin-left: 20px;
+}
+
+.text-wrapper-3 {
+    font-weight: bold;
+    color: #000080;
+    font-size: 25px;
+}
+
+.text-wrapper-4 {
+    color: #000080;
+    font-size: 16px;
+}
+
+.rectangle-2 {
+    width: 140px;
+    height: 120px;
+    background-color: #0099ff;
+    border-radius: 20px;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    line-height: 2.5;
+    margin-top: 20px;
+    margin-left: 100px;
+}
+
+.rectangle-3 {
+    width: 140px;
+    height: 120px;
+    background-color: #0099ff;
+    border-radius: 20px;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    line-height: 2.5;
+    margin-top: 20px;
+    margin-left: 180px;
+}

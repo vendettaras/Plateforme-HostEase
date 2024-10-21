@@ -1,0 +1,139 @@
+.list-offre {
+    /* display: flex; */
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding-top: 20px;
+    background-color: #000080;
+    height: 100vh;
+    width: auto;
+}
+
+.nos-offres {
+    display: flex;
+    justify-content: center;
+}
+
+.text-blanc {
+    color: #ffffff; /* Couleur blanche pour le mot "Nos" */
+    font-weight: bold;
+}
+
+.text-bleu {
+    color: #0099FF; /* Couleur bleue pour le mot "Offres" */
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.carte1 {
+    margin-top: 30px;
+    height: 500px;
+    width: 280px;
+    background-color: #0099FF;
+    padding: 20px 25px 15px 25px;
+    margin-left: 40px;
+}
+
+.intro {
+    text-align: left;
+    color: #ffffff;
+    font-size: 25px;}
+
+.bold-texte {
+    font-weight: bold;
+}
+
+.texte-centre {
+    color: #ffffff;
+    text-align: left;
+    line-height: 2;
+}
+
+.image {
+    height: 250px;
+    width: auto;
+}
+
+.carte2 {
+    margin-top: 30px;
+    height: 500px;
+    width: 280px;
+    background-color: #f2f2f2;
+    padding: 20px 25px 15px 25px;
+    text-align: left;
+    margin-left: 40px;
+}
+
+.description {
+    text-align: left;
+    color: #000080;
+    font-size: 25px;
+}
+
+.vousAurez {
+    color: #0099FF;
+}
+
+.description-offre {
+    color: #000080;
+    margin-right: 10px;
+}
+
+.custom-line {
+    width: 90%; /* Longueur de la ligne */
+    border: 0;
+    border-top: 3px solid #000080; /* Épaisseur et couleur de la ligne */
+    margin: 20px auto; /* Centre la ligne */
+}
+
+.offre {
+    display: flex;
+    justify-content: center;
+}
+
+.prix-offre {
+    font-weight: bolder;
+    font-size: 40px;
+    color: #000080;
+}
+
+.mois {
+    color: #0099FF;
+    font-size: 25px;
+    margin-top: 25px;
+}
+
+.en-savoir {
+    border: 2px solid #0099FF;    /* Bordure initiale */
+    width: 230px;
+    height: 40px;
+    color: #0099ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: border 0.3s;      /* Transition pour l'effet de bordure */
+    margin-top: 80px;
+}
+
+.en-savoir button {
+    width: 230px;
+    height: 40px;
+    background: none;             /* Retire tout background initial */
+    border: none;                 /* Retire les bordures du bouton */
+    color: #0099ff;               /* Couleur du texte initiale */
+    font-size: 16px;              /* Taille du texte */
+    cursor: pointer;              /* Pour avoir le curseur en forme de main */
+    transition: background-color 0.3s, color 0.3s; /* Transition douce */
+}
+
+.en-savoir:hover {
+    border-color: #000080;        /* Changement de la bordure au survol du conteneur */
+}
+
+.en-savoir button:hover {
+    background-color: #000080;    /* Couleur du fond au survol */
+    color: #ffffff;               /* Couleur du texte au survol */
+}
+
+
+
