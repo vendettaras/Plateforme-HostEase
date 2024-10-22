@@ -135,5 +135,103 @@
     color: #ffffff;               /* Couleur du texte au survol */
 }
 
-
-
+/* Styles généraux */
+.login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh; /* Prend toute la hauteur de la page */
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Container pour les inputs, labels et icônes */
+  .input-container {
+    position: relative;
+    margin-bottom: 35px;
+    width: 300px;
+  }
+  
+  .input-container i {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: #cccccc;
+    font-size: 20px;
+    transition: color 0.3s ease; /* Ajout d'une transition pour la couleur */
+  }
+  
+  .input-container input {
+    width: 100%;
+    padding: 10px 10px 10px 40px; /* Espacement à gauche pour l'icône */
+    border: none;
+    border-bottom: 2px solid #cccccc;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+  
+  .input-container input:focus {
+    border-bottom-color: #0099FF;
+    outline: none;
+  }
+  
+  /* Changement de couleur pour l'icône lors du focus ou quand du texte est présent */
+  .input-container input:focus ~ i,
+  .input-container input:not(:placeholder-shown) ~ i {
+    color: #0099FF; /* Couleur bleue pour l'icône lors du focus ou si du texte est présent */
+  }
+  
+  /* Style pour le label */
+  .input-container label {
+    position: absolute;
+    top: 50%;
+    left: 40px; /* Espacement pour laisser la place à l'icône */
+    transform: translateY(-50%);
+    color: #cccccc;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+  
+  .input-container input:focus + label,
+  .input-container input:not(:placeholder-shown) + label {
+    top: -10px;
+    font-size: 16px;
+    color: #0099FF;
+  }
+  
+  /* Style pour le lien d'inscription */
+  .para {
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  .para a {
+    color: #0099FF;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  /* Style pour le bouton de connexion */
+  .connex {
+    width: 300px;
+    height: 40px;
+    background-color: #0099ff;
+    color: #ffffff;
+    font-weight: bold;
+    border: none;
+    margin-top: 20px;
+    cursor: pointer;
+  }
+  
+  

@@ -1,38 +1,90 @@
+/* Style général du header */
 .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
     background-color: #000080;
-    height: 56px;
-    margin: 0;
-    padding: 0;
-    display: flex; /* Utilise flexbox pour aligner les éléments */
-    justify-content: space-between; /* Écarte les éléments */
-    align-items: center; /* Aligne verticalement les éléments au centre */
-    padding: 0 20px; /* Ajoute un peu d'espace à gauche et à droite */
+    color: white;
 }
 
-.header .logo {
-    height: 50px; /* Ajustez la taille selon vos besoins */
-    margin-right: 50px; /* Espace entre l'image et les liens */
+.logo {
+    height: 50px;
 }
 
-.header .links {
-    display: flex; /* Utilise flexbox pour les liens */
-    justify-content: center; /* Centre les liens */
-    flex-grow: 1; /* Permet à cette section de grandir pour occuper l'espace */
+.links a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
 }
 
-.header a {
-    color: #ffffff; /* Couleur des liens */
-    text-decoration: none; /* Supprime le soulignement */
-    margin-right: 15px; /* Espacement entre les liens */
+.links a:hover {
+    text-decoration: underline;
 }
 
-.header a:hover {
-    color: #0099ff; /* Couleur au survol */
+/* Section de l'utilisateur */
+.user-section {
+    position: relative;
 }
 
-.header button {
-    color: #ffffff; /* Couleur du texte du bouton */
-    background: transparent; /* Fond transparent pour le bouton */
-    border: none; /* Supprime la bordure */
-    cursor: pointer; /* Change le curseur pour indiquer un bouton cliquable */
+.user-info {
+    /* display: flex; */
+    align-items: center;
+    cursor: pointer;
 }
+
+.user-avatar {
+    margin-right: 10px;
+    font-size: 24px;
+}
+
+.user-name {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* Style du menu déroulant */
+/* Style du menu déroulant */
+.dropdown-menu {
+    background-color: transparent; /* Couleur de fond personnalisée */
+    border: none; /* Suppression de la bordure */
+    padding: 0; /* Pas de padding par défaut */
+    margin: 0; /* Pas de margin par défaut */
+    z-index: 1000; /* Assure que le dropdown est au-dessus des autres éléments */
+    position: absolute; /* Positionnement absolu */
+    top: 100%; /* Juste en dessous de l'élément parent */
+    left: 0; /* Alignement à gauche */
+    width: 120px; /* Largeur personnalisée */
+    margin-top: 12px; /* Espace au-dessus du dropdown */
+    display: block; /* S'assurer que le dropdown s'affiche comme un bloc */
+}
+
+.dropdown-menu li {
+    display: block; /* Chaque élément s'affiche sur une nouvelle ligne */
+    width: 100%; /* Prend toute la largeur du dropdown */
+}
+
+.dropdown-menu a,
+.dropdown-menu button {
+    padding: 10px; /* Espacement autour du texte */
+    text-align: left; /* Alignement du texte à gauche */
+    width: 100%; /* Prend toute la largeur du dropdown */
+    border: none; /* Pas de bordure par défaut */
+    background: none; /* Pas de fond par défaut */
+    cursor: pointer; /* Changement du curseur pour indiquer que c'est cliquable */
+    text-decoration: none; /* Pas de soulignement pour les liens */
+    color: white; /* Couleur du texte */
+}
+
+.my-custom-dropdown {
+    width: 120px !important; /* Ou sans !important, selon les besoins */
+}
+
+
+.dropdown-menu a:hover, 
+.dropdown-menu button:hover {
+    background-color: #f0f0f0; /* Changer la couleur de fond au survol */
+    color: black; /* Change la couleur du texte lors du survol */
+}
+

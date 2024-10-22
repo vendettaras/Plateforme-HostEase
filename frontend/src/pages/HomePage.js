@@ -4,6 +4,7 @@ import accueil from './image/undraw_visionary_technology_re_jfp7.svg';
 import logo1 from './image/HostEase_blanc.gif';
 import tuto from './image/undraw_tutorial_video_re_wepc.svg';
 import OffreList from './OffreList';
+import EntrepriseList from './EntrepriseList';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -84,6 +85,7 @@ const HomePage = () => {
         </div>
       </section>
       <OffreList />
+      <EntrepriseList />
     </>
   )
 }
