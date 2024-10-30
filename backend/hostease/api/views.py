@@ -2,9 +2,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.generics import RetrieveUpdateAPIView, DestroyAPIView, RetrieveAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, DestroyAPIView, RetrieveAPIView, ListAPIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticated, BasePermission
+
 
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -37,6 +38,10 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 class CustomTokenRefreshView(TokenRefreshView):
     permission_classes = [AllowAny]
+    
+
+# -----------------------------------------Inscription------------------------------------------
+
 
 class InscriptionUserView(APIView):
     def post(self, request):
@@ -48,9 +53,6 @@ class InscriptionUserView(APIView):
                 "message": "Utilisateur créé avec succès"
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# views.py
 
 class InscriptionEntrepriseView(APIView):
     
@@ -74,6 +76,32 @@ class InscriptionEntrepriseView(APIView):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+# -----------------------------------------CustomUser------------------------------------------
+
+class ProfileView(RetrieveUpdateAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'pk'
+
+    def get_object(self):
+        # Retourne l'utilisateur authentifié
+        return self.request.user
+
+class EntrepriseListForUser(ListAPIView):
+    serializer_class = InfoEntrepriseSerializer
+
+    def get_queryset(self):
+        user_id = self.request.query_params.get('user_id', None)
+        if user_id is not None:
+            return InfoEntreprise.objects.filter(user__id=user_id)
+        return InfoEntreprise.objects.none()  # Retourne une liste vide si aucun user_id n'est fourni
+
+# -----------------------------------------Entreprise------------------------------------------
+
+
 class InfoEntrepriseUpdateView(RetrieveUpdateAPIView):
     queryset = InfoEntreprise.objects.all()
     serializer_class = InfoEntrepriseSerializer
@@ -90,6 +118,10 @@ class InfoEntrepriseUpdateView(RetrieveUpdateAPIView):
         request.data['user'] = request.user.id
         return super().update(request, *args, **kwargs)
     
+    def perform_update(self, serializer):
+        # Gestion des fichiers uploadés
+        serializer.save(user=self.request.user)
+    
 class EntrepriseDetailView(RetrieveAPIView):
     queryset = InfoEntreprise.objects.all()
     serializer_class = InfoEntrepriseSerializer
@@ -100,6 +132,18 @@ class EntrepriseDetailView(RetrieveAPIView):
         logger = logging.getLogger(__name__)
         logger.info(f"User: {request.user}, accessing entreprise {kwargs['pk']} details")
         return super().get(request, *args, **kwargs)
+    
+
+class InfoEntrepriseList(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        infoEntreprise = InfoEntreprise.objects.all()
+        serializer = InfoEntrepriseSerializer(infoEntreprise, many=True)
+        return Response(serializer.data)
+    
+
+# -----------------------------------------Offre------------------------------------------
 
 
 class OffreList(APIView):
@@ -108,14 +152,6 @@ class OffreList(APIView):
     def get(self, request):
         offres = Offre.objects.all()
         serializer = OffreSerializer(offres, many=True)
-        return Response(serializer.data)
-    
-class InfoEntrepriseList(APIView):
-    permission_classes = [AllowAny]
-
-    def get(self, request):
-        infoEntreprise = InfoEntreprise.objects.all()
-        serializer = InfoEntrepriseSerializer(infoEntreprise, many=True)
         return Response(serializer.data)
 
 

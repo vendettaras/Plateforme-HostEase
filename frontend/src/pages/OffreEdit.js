@@ -13,24 +13,32 @@ const OffreEdit = () => {
         description: ''
     });
 
+    // Fonction pour récupérer une offre
     useEffect(() => {
-
         const fetchOffer = async () => {
             try {
-                // console.log(`Fetching offer with ID: ${id}`); // Ajoutez ce log
-                const response = await fetch(`http://127.0.0.1:8000/api/offre/${id}/`, {
+                let response = await fetch(`http://127.0.0.1:8000/api/offre/${id}/`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authTokens?.access}` // Utilise le token d'accès mis à jour
-            },
+                        'Authorization': `Bearer ${authTokens?.access}`
+                    },
                 });
-                
-                // console.log('Response status:', response.status); // Log du statut de la réponse
-                
+
+                if (response.status === 401) {
+                    // Rafraîchir le token si nécessaire
+                    await updateToken();
+                    response = await fetch(`http://127.0.0.1:8000/api/offre/${id}/`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authTokens?.access}`
+                        },
+                    });
+                }
+
                 if (response.ok) {
-                    let data = await response.json();
-                    // console.log('Fetched data:', data); // Log des données récupérées
+                    const data = await response.json();
                     setOffer(data);
                 } else {
                     console.error('Erreur lors de la récupération de l\'offre');
@@ -39,36 +47,43 @@ const OffreEdit = () => {
                 console.error('Erreur réseau', error);
             }
         };
-        
 
-        if (id) { // S'assurer que l'ID est défini avant de faire l'appel à l'API
+        if (id) {
             fetchOffer();
         }
-    }, [id, authTokens]);
+    }, [id, authTokens, updateToken]);
 
+    // Fonction pour soumettre les modifications de l'offre
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Mise à jour du token si nécessaire
-        if (updateToken) {
-            await updateToken();
-        }
 
         try {
             let response = await fetch(`http://127.0.0.1:8000/api/offre/${id}/modifier/`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authTokens?.access}` // Utilise le token d'accès pour l'autorisation
+                    'Authorization': `Bearer ${authTokens?.access}`
                 },
                 body: JSON.stringify(offer),
             });
+
+            if (response.status === 401) {
+                await updateToken();
+                response = await fetch(`http://127.0.0.1:8000/api/offre/${id}/modifier/`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authTokens?.access}`
+                    },
+                    body: JSON.stringify(offer),
+                });
+            }
 
             if (response.ok) {
                 navigate('/offre-list'); // Redirige vers la liste des offres après modification
             } else {
                 const data = await response.json();
-                console.error('Error:', data);
+                console.error('Erreur:', data);
                 alert(data.detail || 'Une erreur est survenue');
             }
         } catch (error) {
@@ -76,7 +91,7 @@ const OffreEdit = () => {
         }
     };
 
-    // Gestion des modifications du formulaire
+    // Fonction pour gérer les modifications des champs de formulaire
     const handleChange = (e) => {
         setOffer({
             ...offer,
@@ -88,27 +103,35 @@ const OffreEdit = () => {
     const handleDelete = async () => {
         const confirmDelete = window.confirm("Êtes-vous sûr de vouloir supprimer cette offre ?");
         if (confirmDelete) {
-            // Mise à jour du token si nécessaire
-            if (updateToken) {
-                await updateToken();
-            }
-    
-            const response = await fetch(`http://127.0.0.1:8000/api/offre/${id}/delete/`, {  // Modifié ici
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${authTokens?.access}`
-                },
-            });
-    
-            if (response.ok) {
-                console.log("Offre supprimée avec succès");
-                navigate('/offre-list'); // Redirige vers la liste des offres après suppression
-            } else {
-                console.error('Erreur lors de la suppression de l\'offre');
+            try {
+                let response = await fetch(`http://127.0.0.1:8000/api/offre/${id}/delete/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authTokens?.access}`
+                    },
+                });
+
+                if (response.status === 401) {
+                    await updateToken();
+                    response = await fetch(`http://127.0.0.1:8000/api/offre/${id}/delete/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${authTokens?.access}`
+                        },
+                    });
+                }
+
+                if (response.ok) {
+                    console.log("Offre supprimée avec succès");
+                    navigate('/offre-list'); // Redirige vers la liste des offres après suppression
+                } else {
+                    console.error('Erreur lors de la suppression de l\'offre');
+                }
+            } catch (error) {
+                console.error('Erreur lors de la suppression de l\'offre', error);
             }
         }
     };
-    
 
     return (
         <div>

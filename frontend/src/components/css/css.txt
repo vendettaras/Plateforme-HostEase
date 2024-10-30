@@ -1,38 +1,283 @@
- .header {
-    background-color: #000080;
-    height: 56px;
-    margin: 0;
-    padding: 0;
-    display: flex; /* Utilise flexbox pour aligner les éléments */
-    justify-content: space-between; /* Écarte les éléments */
-    align-items: center; /* Aligne verticalement les éléments au centre */
-    padding: 0 20px; /* Ajoute un peu d'espace à gauche et à droite */
-}
+{/* <form onSubmit={handleSubmitLogo}>
+                                <div className="logo-detail">
+                                    <img src={entreprise.logo} alt="Logo de l'entreprise" />
+                                    <label htmlFor="logo-input" className="logo-upload">
+                                        <FaEdit className="edit-icon" />
+                                    </label>
+                                    <input
+                                        id="logo-input"
+                                        type="file"
+                                        name="logo"
+                                        accept="image/*"
+                                        style={{ display: 'none' }}
+                                    />
+                                </div>
+                                <button type="submit">Modifier le logo</button>
+                            </form>
+                            {logoMessage && <p>{logoMessage}</p>} */}
 
-.header .logo {
-    height: 50px; /* Ajustez la taille selon vos besoins */
-    margin-right: 50px; /* Espace entre l'image et les liens */
-}
 
-.header .links {
-    display: flex; /* Utilise flexbox pour les liens */
-    justify-content: center; /* Centre les liens */
-    flex-grow: 1; /* Permet à cette section de grandir pour occuper l'espace */
-}
+import React, { useEffect, useState, useContext } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import AuthContext from '../context/AuthContext';
+import { FaEdit } from 'react-icons/fa'; 
 
-.header a {
-    color: #ffffff; /* Couleur des liens */
-    text-decoration: none; /* Supprime le soulignement */
-    margin-right: 15px; /* Espacement entre les liens */
-}
+const InfoEntrepriseEdit = () => {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const { authTokens, updateToken, user } = useContext(AuthContext);
 
-.header a:hover {
-    color: #0099ff; /* Couleur au survol */
-}
+    const [entreprise, setEntreprise] = useState({
+        nom_entreprise: '',
+        nif: '',
+        stat: '',
+        mail: '',
+        contact: '',
+        localisation: '',
+        proprio: '',
+        logo: '',
+    });
 
-.header button {
-    color: #ffffff; /* Couleur du texte du bouton */
-    background: transparent; /* Fond transparent pour le bouton */
-    border: none; /* Supprime la bordure */
-    cursor: pointer; /* Change le curseur pour indiquer un bouton cliquable */
-}
+    const [logoMessage, setLogoMessage] = useState('');
+
+    useEffect(() => {
+        const fetchEntreprise = async () => {
+            try {
+                let response = await fetch(`http://127.0.0.1:8000/api/entreprise/${id}/modifier/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authTokens?.access}`
+                    },
+                });
+
+                if (response.status === 401) {
+                    // Rafraîchir le token si nécessaire
+                    await updateToken();
+                    response = await fetch(`http://127.0.0.1:8000/api/entreprise/${id}/modifier/`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authTokens?.access}`
+                        },
+                    });
+                }
+
+                if (response.ok) {
+                    let data = await response.json();
+                    setEntreprise(data);
+                } else {
+                    console.error('Erreur lors de la récupération de l\'entreprise');
+                }
+            } catch (error) {
+                console.error('Erreur réseau', error);
+            }
+        };
+
+        if (id) {
+            fetchEntreprise();
+        }
+    }, [id, authTokens, updateToken]);
+
+    const handleSubmitInfo = async (e) => {
+        e.preventDefault();
+
+        const updatedData = {
+            nom_entreprise: entreprise.nom_entreprise,
+            nif: entreprise.nif,
+            stat: entreprise.stat,
+            mail: entreprise.mail,
+            contact: entreprise.contact,
+            localisation: entreprise.localisation,
+            proprio: entreprise.proprio,
+        };
+
+        try {
+            let response = await fetch(`http://127.0.0.1:8000/api/entreprise/${id}/modifier/`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${authTokens?.access}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedData),
+            });
+
+            if (response.status === 401) {
+                await updateToken();
+                response = await fetch(`http://127.0.0.1:8000/api/entreprise/${id}/modifier/`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${authTokens?.access}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedData),
+                });
+            }
+
+            if (response.ok) {
+                navigate(`/entreprise/${id}`); // Redirige vers la liste des entreprises
+            } else {
+                const data = await response.json();
+                console.error('Error:', data);
+                alert(data.detail || 'Une erreur est survenue lors de la mise à jour des informations.');
+            }
+        } catch (error) {
+            console.error('Erreur lors de la mise à jour de l\'entreprise', error);
+        }
+    };
+
+    const handleSubmitLogo = async (e) => {
+        e.preventDefault();
+
+        // Créez une nouvelle instance de FormData
+        const formData = new FormData();
+        const fileInput = e.target.logo.files[0];
+
+        if (!fileInput) {
+            alert('Veuillez sélectionner un fichier.');
+            return;
+        }
+
+        formData.append('logo', fileInput);
+
+        try {
+            let response = await fetch(`http://127.0.0.1:8000/api/entreprise/${id}/modifier/`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${authTokens?.access}`,
+                    // Ne définissez pas Content-Type ici, car il sera géré par le navigateur
+                },
+                body: formData,
+            });
+
+            if (response.status === 401) {
+                await updateToken();
+                response = await fetch(`http://127.0.0.1:8000/api/entreprise/${id}/modifier/`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${authTokens?.access}`,
+                    },
+                    body: formData,
+                });
+            }
+
+            if (response.ok) {
+                setLogoMessage('Logo mis à jour avec succès.'); // Affiche un message de succès
+                window.location.reload();
+            } else {
+                const data = await response.json();
+                console.error('Error:', data);
+                alert(data.detail || 'Une erreur est survenue lors de la mise à jour du logo.');
+            }
+        } catch (error) {
+            console.error('Erreur lors de la mise à jour du logo', error);
+        }
+    };    
+
+    const handleChange = (e) => {
+        setEntreprise({
+            ...entreprise,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    return (
+        <div>
+            {user?.id === entreprise.user ? (
+                <form onSubmit={handleSubmitInfo}>
+                    <div className="contenu">
+                        <div className="logo-nom-container">
+                            <div className="no-icon">
+                                <label>Nom de l'entreprise</label>
+                                <input 
+                                    type="text" 
+                                    name="nom_entreprise" 
+                                    value={entreprise.nom_entreprise} 
+                                    onChange={handleChange} 
+                                />
+                            </div>
+                        </div>
+                        <div className="entreprise-info">
+                            <div className="input-container">
+                                <i className="fas fa-id-card"></i>
+                                <input 
+                                    type="text" 
+                                    name="nif" 
+                                    value={entreprise.nif} 
+                                    onChange={handleChange} 
+                                />
+                                <label>NIF :</label>
+                            </div>
+                            <div className="input-container">
+                                <i className="fas fa-file-alt"></i>
+                                <input 
+                                    type="text" 
+                                    name="stat" 
+                                    value={entreprise.stat} 
+                                    onChange={handleChange} 
+                                />
+                                <label>Stat :</label>
+                            </div>
+                            <div className="input-container">
+                                <i className="fas fa-phone"></i>
+                                <input 
+                                    type="text" 
+                                    name="contact" 
+                                    value={entreprise.contact} 
+                                    onChange={handleChange} 
+                                />
+                                <label>Contact :</label>
+                            </div>
+                            <div className="input-container">
+                                <i className="fas fa-map-marker-alt"></i>
+                                <input 
+                                    type="text" 
+                                    name="localisation" 
+                                    value={entreprise.localisation} 
+                                    onChange={handleChange} 
+                                />
+                                <label>Localisation :</label>
+                            </div>
+                            <div className="input-container">
+                                <i className="fas fa-user-tie"></i>
+                                <input 
+                                    type="text" 
+                                    name="proprio" 
+                                    value={entreprise.proprio} 
+                                    onChange={handleChange} 
+                                />
+                                <label>Propriétaire :</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <button type="submit">Soumettre</button>
+                </form>
+            ) : (
+                <p>Vous n'avez pas les droits pour modifier ces informations.</p>
+            )}
+
+            <h1>Modifier le logo de l'entreprise</h1>
+            <form onSubmit={handleSubmitLogo}>
+                <label>
+                    Logo:
+                    <img 
+                        src={entreprise.logo} 
+                        alt="Logo de l'entreprise" 
+                        style={{ width: '100px', height: 'auto' }} 
+                    />
+                    <input 
+                        type="file" 
+                        name="logo" 
+                        accept="image/*" 
+                    />
+                </label>
+                <br />
+                <button type="submit">Modifier le logo</button>
+            </form>
+            {logoMessage && <p>{logoMessage}</p>}
+        </div>
+    );
+};
+
+export default InfoEntrepriseEdit;

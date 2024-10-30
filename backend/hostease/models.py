@@ -3,16 +3,16 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils import timezone
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, nom, password=None, role='entreprise'):
+    def create_user(self, email, nom, password=None, role='entreprise', photo=None):
         if not email:
             raise ValueError("Les utilisateurs doivent avoir une adresse e-mail.")
-        user = self.model(email=email, nom=nom, role=role)
+        user = self.model(email=email, nom=nom, role=role, photo=photo)
         user.set_password(password)  # Utilise la méthode pour hacher le mot de passe
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, nom, password):
-        user = self.create_user(email=email, nom=nom, password=password, role='admin')
+    def create_superuser(self, email, nom, password, photo=None):
+        user = self.create_user(email=email, nom=nom, password=password, role='admin', photo=photo)
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
@@ -29,6 +29,7 @@ class CustomUser(AbstractBaseUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='entreprise')
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    photo = models.ImageField(blank=True, upload_to='userPhoto/', null=True)
     last_login = models.DateTimeField(default=timezone.now)
 
     objects = CustomUserManager()
@@ -63,7 +64,7 @@ class InfoEntreprise(models.Model):
     stat = models.CharField(max_length=30, null=True)
     localisation = models.CharField(max_length=50, null=True)
     proprio = models.CharField(max_length=50, null=True)
-    logo = models.ImageField(blank=True, upload_to='logo/')
+    logo = models.ImageField(blank=True, upload_to='logo/', null=True)
     nb_avis = models.IntegerField(default=0)
     nb_client = models.IntegerField(default=0)
     nb_partenaire = models.IntegerField(default=0)

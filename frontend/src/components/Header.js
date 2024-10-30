@@ -26,14 +26,24 @@ const Header = () => {
             {user ? (
                 <div className="user-section dropdown">
                     <div className="user-info" onClick={toggleDropdown} id="userDropdown" role="button" aria-expanded={dropdownOpen}>
-                        <FontAwesomeIcon icon={faUser} className="user-avatar" />
+                        <img src={`http://127.0.0.1:8000/${user.photo}`}
+                            alt="Logo de l'entreprise"
+                            style={{
+                                width: '40px',
+                                height: '40px',
+                                borderRadius: '50%',
+                                border: '1px solid #000080',
+                                objectFit: 'cover',
+                                marginRight:'10px',
+                            }}
+                        />
                         <span className="user-name">{user.nom}</span>
                         <i className={`fas fa-chevron-down chevron ${dropdownOpen ? 'open' : ''}`}></i>
                     </div>
                     {dropdownOpen && (
                         <ul className="dropdown-menu my-custom-dropdown show" aria-labelledby="userDropdown">
                             <li>
-                                <Link to={`/user/${user.id}/details`} className="dropdown-item">Profil</Link>
+                                <Link to={`/user/${user.id}/`} className="dropdown-item">Profil</Link>
                             </li>
                             <li>
                                 <button className="dropdown-item" onClick={logoutUser}>Logout</button>

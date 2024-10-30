@@ -36,8 +36,8 @@ const OffreList = () => {
         <div>
             <section className="list-offre">
                 <h3 className="nos-offres">
-                    <span class="text-blanc">Nos </span>
-                    <span class="text-bleu">Offres</span>
+                    <span className="text-blanc">Nos </span>
+                    <span className="text-bleu">Offres</span>
                 </h3>
                 <div className="container text-center">
                     <div className="row justify-content-center">

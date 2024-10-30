@@ -1,0 +1,162 @@
+.global-1 {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    height: 95vh;
+}
+
+.detail-entreprise {
+    display: flex;
+    justify-content: center;
+    background-color: #f2f2f2;
+    width: 800px;
+    padding-left: 40px;
+}
+
+.no-icon-1 label {
+    color: #0099ff;
+}
+
+.no-icon-1 input {
+    margin-left: 0px;
+}
+
+.contenu-1 {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    background-color: #f2f2f2;
+}
+
+.input-container img {
+    position: absolute;
+    top: 20px;
+    left: 5px;
+    transform: translateY(-50%);
+    color: #0099ff;
+    font-size: 20px;
+    transition: color 0.3s ease;
+}
+
+.logo-nom-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0px;
+}
+
+/* Conteneur principal pour l'alignement vertical */
+.logo-detail1-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+/* Conteneur de l'image et de l'icône */
+.logo-detail1 {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Ajuste cette valeur selon tes besoins */
+}
+
+.logo-detail1 img {
+    width: 120px;
+    height: auto; /* Optionnel : pour arrondir les coins */
+}
+
+/* Positionnement de l'icône en bas à droite de l'image */
+.logo-upload span {
+    position: absolute;
+    bottom: 0px; 
+    right: 0px;
+    border-radius: 50%;
+    padding: 6px;
+    cursor: pointer;
+    font-size: 24px;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0099ff;
+}
+
+/* Conteneur du bouton pour l'alignement en dessous de l'image */
+.button-container {
+    margin-top: 5px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+button {
+    background-color: #f2f2f2;
+    color: #0099ff;
+    border: 1px solid #0099ff;
+    cursor: pointer;
+    width: 100%;
+    height: 40px;
+}
+
+button:hover {
+    background-color: #0099ff;
+    color: #ffffff;
+}
+
+
+.contenu-1 form {
+    border: none;
+    background-color: #f2f2f2;
+    box-shadow: none;
+}
+
+.no-icon-1 {
+    margin-left: 0px;
+}
+
+.contenu-1 .input-container {
+    background-color: #f2f2f2;
+    border: none;
+}
+
+/* Conteneur des boutons */
+.ajust-1 {
+    display: flex;
+    gap: 20px; /* Espace entre les boutons, ajustez selon vos besoins */
+    justify-content: center; /* Centre les boutons horizontalement */
+    align-items: center; /* Aligne les boutons verticalement */
+    margin-top: 20px; /* Espace au-dessus du conteneur */
+}
+
+/* Styles des boutons */
+button .retour {
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Style pour le bouton Enregistrer */
+.enregistrer {
+    background-color: #007bff;
+    color: #fff;
+    width: 200px;
+}
+
+.enregistrer:hover {
+    background-color: #0099ff;
+    color: #ffffff;
+}
+
+/* Style pour le bouton Retour */
+.retour-1 {
+    background-color: #000080;
+    color: #fff;
+    width: 200px;
+    border: none;
+}
+
+.retour-1:hover {
+    background-color: #000060;
+}

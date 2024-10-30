@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import './css/entreprise-detail.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import { Link } from 'react-router-dom';
 
 const EntrepriseDetail = () => {
     const { id } = useParams(); // Récupère l'ID depuis l'URL
@@ -41,64 +43,59 @@ const EntrepriseDetail = () => {
                         <div className="logo-detail">
                             <img src={entreprise.logo} alt="Logo de l'entreprise" />
                         </div>
-                        <div className="input-container no-icon">
-                            <input type="text" value={entreprise.nom_entreprise} />
+                        <div className="no-icon">
                             <label>Nom de l'entreprise</label>
+                            <input type="text" value={entreprise.nom_entreprise} readOnly />
                         </div>
                     </div>
                     <div className="entreprise-info">
                         <div className="input-container">
                             <i className="fas fa-id-card"></i>
-                            <input type="text" value={entreprise.nif} />
+                            <input type="text" value={entreprise.nif} readOnly />
                             <label>NIF :</label>
                         </div>
                         <div className="input-container">
                             <i className="fas fa-file-alt"></i>
-                            <input type="text" value={entreprise.stat} />
+                            <input type="text" value={entreprise.stat} readOnly />
                             <label>Stat :</label>
                         </div>
                         <div className="input-container">
                             <i className="fas fa-phone"></i>
-                            <input type="text" value={entreprise.contact} />
+                            <input type="text" value={entreprise.contact} readOnly />
                             <label>Contact :</label>
                         </div>
                         <div className="input-container">
                             <i className="fas fa-map-marker-alt"></i>
-                            <input type="text" value={entreprise.localisation} />
+                            <input type="text" value={entreprise.localisation} readOnly />
                             <label>Localisation :</label>
                         </div>
                         <div className="input-container">
                             <i className="fas fa-user-tie"></i>
-                            <input type="text" value={entreprise.proprio} />
+                            <input type="text" value={entreprise.proprio} readOnly />
                             <label>Propriétaire :</label>
                         </div>
+
+                        {/* Afficher les informations de l'utilisateur */}
+                        {user && (
+                            <div className="user-info">
+                                <h3>Informations Utilisateur</h3>
+                                <p>Nom: {user.nom}</p> {/* Changez 'nom' en fonction de ce qui est dans le token */}
+                                <p>Email: {user.email}</p> {/* Changez 'email' en fonction de ce qui est dans le token */}
+                            </div>
+                        )}
+
                         <div className="ajust">
-                            <Link to={`/entreprise-list`}>
+                            <Link to="/entreprise-list">
                                 <button className="retour">Retour</button>
                             </Link>
-                            {authTokens && entreprise.user.id === user.id && (
-                                <button onClick={handleEdit} className="ajust-b">Modifier</button>
+                            {authTokens && entreprise.user === user.id && ( // Vérifiez si l'utilisateur est le propriétaire
+                                <button className="ajust-b" onClick={handleEdit}>Modifier</button>
                             )}
                         </div>
-                    </div>
-                    <div className="user_info">
-                        <p>{entreprise.user.nom}</p>
-                        <p>{entreprise.user.email}</p>
-                        <img src={entreprise.user.photo} 
-                        alt="Logo de l'entreprise" 
-                        style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '50%',
-                            border: '1px solid #000080',
-                            objectFit: 'cover',
-                        }}
-                        />
                     </div>
                 </div>
             </div>
         </div>
-
     );
 };
 

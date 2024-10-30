@@ -46,7 +46,7 @@ const EntrepriseList = () => {
                 <div className="col-3" key={entreprise.id}>
                   <div className="carte-entreprise">
                     <p>
-                      <img src={`${baseUrl}${entreprise.logo}`} alt={entreprise.nom_entreprise} style={{ width: '50px', height: 'auto' }} />
+                      <img src={`${baseUrl}${entreprise.logo}`} alt={entreprise.nom_entreprise} style={{ width: 'auto', height: '50px' }} />
                       <span className="nom-entreprise">{entreprise.nom_entreprise}</span>
                     </p>
                     <hr />

@@ -3,7 +3,7 @@ import './App.css';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // import PrivateRoute from './utils/PrivateRoute';
-import { AuthProvider } from './context/AuthContext';
+import  { AuthProvider } from './context/AuthContext';
 
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
@@ -16,6 +16,7 @@ import InfoEntrepriseEdit from './pages/InfoEntrepriseEdit';
 import EntrepriseList from './pages/EntrepriseList';
 import EntrepriseDetail from './pages/EntrepriseDetail';
 import OffreDetail from './pages/OffreDetail';
+// import Profile from './pages/Profile';
 
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
               <Route path="/entreprise-list" element={<EntrepriseList />} />
               <Route path="/entreprise/:id" element={<EntrepriseDetail />} />
               <Route path="/offre/:id" element={<OffreDetail />} />
+              {/* <Route path="/user/:id" element={<Profile />} /> */}
             </Routes>
           </AuthProvider>
         </Router>

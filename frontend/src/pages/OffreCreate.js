@@ -36,6 +36,18 @@ const OffreCreate = () => {
             })
         });
 
+        if (response.status === 401) {
+            // Rafraîchir le token si nécessaire
+            await updateToken();
+            response = await fetch(`http://127.0.0.1:8000/api/offre/create/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authTokens?.access}`
+                },
+            });
+        }
+
         if (response.ok) {
             navigate('/offre-list');
         } else {

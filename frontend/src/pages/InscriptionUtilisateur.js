@@ -4,30 +4,30 @@ const InscriptionUtilisateur = ({ onUserCreated }) => {
   const [email, setEmail] = useState('');
   const [nom, setNom] = useState('');
   const [password, setPassword] = useState('');
+  const [photo, setPhoto] = useState(null);
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const userData = {
-      email: email,
-      nom: nom,
-      password: password
-    };
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('nom', nom);
+    formData.append('password', password);
+    if (photo) {
+      formData.append('photo', photo);
+    }
 
     try {
       const response = await fetch("http://127.0.0.1:8000/api/register-user/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
+        body: formData,
       });
 
       if (response.ok) {
         const data = await response.json();
         console.log("Utilisateur créé avec succès", data);
-        onUserCreated(data.id);  // Transmet l'ID de l'utilisateur pour la prochaine étape
+        onUserCreated(data.id);
       } else {
         const errorData = await response.json();
         console.error("Erreur lors de la création de l'utilisateur:", errorData);
@@ -36,6 +36,7 @@ const InscriptionUtilisateur = ({ onUserCreated }) => {
       console.error("Erreur:", error);
     }
   };
+
 
   return (
     <form onSubmit={handleSubmit}>
@@ -59,6 +60,10 @@ const InscriptionUtilisateur = ({ onUserCreated }) => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
+      />
+      <input
+        type="file"
+        onChange={(e) => setPhoto(e.target.files[0])}
       />
       <button type="submit">S'inscrire</button>
     </form>

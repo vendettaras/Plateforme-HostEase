@@ -1,0 +1,199 @@
+.global {
+    padding: 80px;
+    display: flex;
+    justify-content: center;
+}
+
+.detail-entreprise {
+    display: flex;
+    justify-content: center;
+    background-color: #f2f2f2;
+    width: 800px;
+    padding-left: 0px;
+}
+
+.contenu {
+    width: 100%;
+    max-width: 800px;
+    background-color: #f2f2f2;
+    position: relative;
+    padding: 0px 50px 20px 50px;
+}
+
+.contenu, 
+.contenu .input-container {
+    background-color: #f2f2f2;
+    border: none;
+}
+
+.contenu input {
+    background-color: inherit; /* Hérite du background-color de son parent */
+    border: none;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+.logo-nom-container {
+    display: flex;
+    align-items: center;
+}
+
+.no-icon {
+    margin-left: 170px;
+}
+
+.no-icon input {
+    padding-left: 10px; /* Ajuste l'espacement à gauche pour l'input */
+    width: 70%;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 2px solid #cccccc;
+    background-color: #f2f2f2;
+    font-size: 30px;
+}
+
+.no-icon label {
+
+    color: #0099ff;
+}
+
+
+/* Le label est centré verticalement et aligné à gauche */
+.input-conainer .no-icon label {
+    position: absolute;
+    top: 0;
+    left: 0px;
+    transform: translateY(50%); /* Centrer verticalement */
+    color: #cccccc;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    padding-left: 10px;
+    line-height: 36px; /* Ajuste la hauteur pour l'alignement du texte */
+}
+
+.logo-detail {
+    position: relative;
+    width: 300px;
+    height: 150px;
+    top: -60px;
+    left: 150px;
+    overflow: hidden;
+    border: 1px solid #000080;
+    background-color: #f2f2f2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo-detail img {
+    width: auto;
+    height: 120px;
+    object-fit: cover;
+}
+
+.input-container {
+    position: relative;
+    margin-bottom: 10px;
+    width: 300px;
+}
+
+.input-container i {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: #0099ff;
+    font-size: 20px;
+    transition: color 0.3s ease;
+}
+
+.input-container input {
+    width: 100%;
+    padding: 10px 10px 10px 40px;
+    border: none;
+    border-bottom: 2px solid #cccccc;
+    background-color: #f2f2f2;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.input-container input:focus {
+    border-bottom-color: #0099FF;
+    outline: none;
+}
+
+.input-container input:focus ~ i,
+.input-container input:not(:placeholder-shown) ~ i {
+    color: #0099FF;
+}
+
+.input-container label {
+    position: absolute;
+    top: 50%;
+    left: 50px;
+    transform: translateY(-50%);
+    color: #cccccc;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.input-container input:focus + label,
+.input-container input:not(:placeholder-shown) + label {
+    top: -1px;
+    font-size: 16px;
+    color: #0099FF;
+}
+
+.entreprise-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.entreprise-info div {
+    padding: 10px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+}
+
+.ajust {
+    display: flex;
+    gap: 20px; /* Espace entre les boutons, ajustez selon vos besoins */
+    justify-content: center; /* Centre les boutons horizontalement */
+    align-items: center; /* Aligne les boutons verticalement */
+    background-color: #f2f2f2 !important;
+    border: none !important;
+}
+
+.ajust-b {
+    width: 150px;
+    height: 40px;
+    background-color: #007bff;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.ajust-b:hover {
+    background-color: #0099ff;
+    color: #ffffff;
+    border: none;
+}
+
+.retour {
+    border: none;
+    width: 150px;
+    height: 40px;
+    background-color: #000080;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.retour:hover {
+    background-color: #000060;
+    color: #ffffff;
+    border: none;
+}

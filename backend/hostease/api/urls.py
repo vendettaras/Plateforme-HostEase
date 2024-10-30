@@ -13,6 +13,8 @@ from .views import (
     InfoEntrepriseUpdateView,
     InfoEntrepriseList,
     EntrepriseDetailView,
+    ProfileView,
+    EntrepriseListForUser
     )
 
 urlpatterns = [
@@ -27,6 +29,10 @@ urlpatterns = [
 
     path('register-user/', InscriptionUserView.as_view(), name='register_user'),
     path('register-entreprise/', InscriptionEntrepriseView.as_view(), name='register_entreprise'),
+
+    # CUSTOMUSER ,
+    path('customUser/<int:pk>/', ProfileView.as_view(), name='user-detail'),
+    path('entreprises/user/', EntrepriseListForUser.as_view(), name='entreprise-list-for-user'),
 
     # ENTREPRISES ,
 
