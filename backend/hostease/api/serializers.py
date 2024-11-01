@@ -26,31 +26,48 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = CustomUser
-        fields = ['id', 'nom', 'email', 'photo' ]
+        model = CustomUser  # Remplacez par votre modèle d’utilisateur
+        fields = ['id', 'nom', 'email', 'photo']  # Champs que vous voulez permettre de modifier
+        extra_kwargs = {
+            'id': {'read_only': True}
+        }
 
 
 class InfoEntrepriseSerializer(serializers.ModelSerializer):
-    user = CustomUserSerializer()
+    user = CustomUserSerializer(read_only=False)  # Changez en False si vous voulez mettre à jour aussi
 
     class Meta:
         model = InfoEntreprise
         fields = '__all__'
 
+
     def update(self, instance, validated_data):
-        user_data = validated_data.pop('user', None)  # Retirer les données de l'utilisateur
-        # Mettre à jour tous les champs sauf 'logo' s'il n'est pas dans validated_data
+        user_data = validated_data.pop('user', None)
+
+        # Mise à jour des champs de InfoEntreprise
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-
-        # Si les données de l'utilisateur sont fournies, mettez-les à jour
-        if user_data:
-            # Supposons que vous avez une méthode pour mettre à jour l'utilisateur
-            user_serializer = CustomUserSerializer(instance.user, data=user_data)
-            if user_serializer.is_valid():
-                user_serializer.save()  # Sauvegarder les modifications utilisateur
-
         instance.save()
+
+        # Mise à jour des données de l'utilisateur
+        if user_data:
+            user = instance.user
+
+            # Vérifier l'unicité de l'email avant de le mettre à jour
+            email = user_data.get('email')
+            # if email and CustomUser.objects.exclude(id=user.id).filter(email=email).exists():
+            #     raise serializers.ValidationError({'user': {'email': 'Un utilisateur avec cet e-mail existe déjà.'}})
+            
+            # email = user_data.get('email')
+            if email and email != user.email:  # Vérifiez si l'email a changé
+                # Si l'email a changé, vérifiez son unicité
+                if CustomUser.objects.exclude(id=user.id).filter(email=email).exists():
+                    raise serializers.ValidationError({'user': {'email': 'Un utilisateur avec cet e-mail existe déjà.'}})
+
+            for attr, value in user_data.items():
+                setattr(user, attr, value)
+            user.save()
+
         return instance
 
 

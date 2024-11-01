@@ -105,7 +105,7 @@ class EntrepriseListForUser(ListAPIView):
 class InfoEntrepriseUpdateView(RetrieveUpdateAPIView):
     queryset = InfoEntreprise.objects.all()
     serializer_class = InfoEntrepriseSerializer
-    permission_classes = [IsAuthenticated, IsOwner]  # Assurez-vous que les deux permissions sont là
+    permission_classes = [AllowAny]
     lookup_field = 'pk'
 
     def get(self, request, *args, **kwargs):
@@ -114,13 +114,20 @@ class InfoEntrepriseUpdateView(RetrieveUpdateAPIView):
         return super().get(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
-    # Assigner automatiquement l'utilisateur connecté au champ 'user'
-        request.data['user'] = request.user.id
-        return super().update(request, *args, **kwargs)
-    
-    def perform_update(self, serializer):
-        # Gestion des fichiers uploadés
-        serializer.save(user=self.request.user)
+        logger = logging.getLogger(__name__)
+        data = request.data.copy()
+        data['user'] = request.user.id
+
+        serializer = self.get_serializer(instance=self.get_object(), data=data)
+
+        if not serializer.is_valid():
+            logger.error(f"Validation errors: {serializer.errors}")  # Journalisez les erreurs de validation
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        self.perform_update(serializer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
     
 class EntrepriseDetailView(RetrieveAPIView):
     queryset = InfoEntreprise.objects.all()

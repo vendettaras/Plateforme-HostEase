@@ -7,7 +7,9 @@ import './css/infoEedit.css';
 const InfoEntrepriseEdit = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { authTokens, updateToken, user } = useContext(AuthContext);
+    const { authTokens, updateToken } = useContext(AuthContext);
+
+    const [logoMessage, setLogoMessage] = useState('');
 
     const [entreprise, setEntreprise] = useState({
         nom_entreprise: '',
@@ -16,121 +18,105 @@ const InfoEntrepriseEdit = () => {
         contact: '',
         localisation: '',
         proprio: '',
-        logo: '',
-        user: user.id,  // Ajout du champ user avec l'ID de l'utilisateur
+        logo:'',
+        user: {
+            nom: '',
+            email: '',
+            photo: '',
+        },
     });
-
-    const [logoMessage, setLogoMessage] = useState('');
-    const [utilisateurs, setUtilisateurs] = useState([]); // État pour stocker les utilisateurs
-    const [utilisateurModif, setUtilisateurModif] = useState(null); // État pour l'utilisateur à modifier
 
     useEffect(() => {
         const fetchEntreprise = async () => {
             try {
-                let response = await fetch(`http://127.0.0.1:8000/api/entreprise/${id}/modifier/`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authTokens?.access}`
-                    },
-                });
-
-                if (response.status === 401) {
-                    // Rafraîchir le token si nécessaire
-                    await updateToken();
-                    response = await fetch(`http://127.0.0.1:8000/api/entreprise/${id}/modifier/`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${authTokens?.access}`
-                        },
-                    });
+                const response = await fetch(`http://127.0.0.1:8000/api/entreprise/${id}/`);
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la récupération des données');
                 }
-
-                if (response.ok) {
-                    let data = await response.json();
-                    setEntreprise(data);
-                } else {
-                    console.error('Erreur lors de la récupération de l\'entreprise');
-                }
+                const data = await response.json();
+                setEntreprise(data);
             } catch (error) {
-                console.error('Erreur réseau', error);
+                console.error('Erreur:', error);
             }
         };
 
-        const fetchUtilisateurs = async () => {
-            try {
-                let response = await fetch(`http://127.0.0.1:8000/api/utilisateurs/`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authTokens?.access}`
-                    },
-                });
+        fetchEntreprise();
+    }, [id]);
 
-                if (response.ok) {
-                    let data = await response.json();
-                    setUtilisateurs(data);
-                } else {
-                    console.error('Erreur lors de la récupération des utilisateurs');
-                }
-            } catch (error) {
-                console.error('Erreur réseau', error);
-            }
-        };
+    const handleEntrepriseChange = (e) => {
+        const { name, value } = e.target;
+        setEntreprise((prev) => ({ ...prev, [name]: value }));
+    };
 
-        if (id) {
-            fetchEntreprise();
-            fetchUtilisateurs(); // Récupérer les utilisateurs associés à l'entreprise
-        }
-    }, [id, authTokens, updateToken]);
+    const handleUserChange = (e) => {
+        const { name, value } = e.target;
+        setEntreprise((prev) => ({
+            ...prev,
+            user: { ...prev.user, [name]: value },
+        }));
+    };
 
     const handleSubmitInfo = async (e) => {
         e.preventDefault();
+        const formData = new FormData();
 
-        const updatedData = {
-            nom_entreprise: entreprise.nom_entreprise,
-            nif: entreprise.nif,
-            stat: entreprise.stat,
-            contact: entreprise.contact,
-            localisation: entreprise.localisation,
-            proprio: entreprise.proprio,
-            user: entreprise.user,  // Inclure le champ user dans les données mises à jour
-        };
+        // Ajoutez les informations de l'entreprise au FormData
+        formData.append('nom_entreprise', entreprise.nom_entreprise);
+        formData.append('nif', entreprise.nif);
+        formData.append('stat', entreprise.stat);
+        formData.append('contact', entreprise.contact);
+        formData.append('localisation', entreprise.localisation);
+        formData.append('proprio', entreprise.proprio);
+        formData.append('user', entreprise.user.id); // ID de l'utilisateur
+
+        // Ajoutez les données utilisateur
+        formData.append('user.nom', entreprise.user.nom);
+        formData.append('user.email', entreprise.user.email);
+
+        // Vérifiez que la photo est bien un fichier avant de l'ajouter
+        if (entreprise.user.photo && entreprise.user.photo instanceof File) {
+            formData.append('user.photo', entreprise.user.photo);
+        }
 
         try {
             let response = await fetch(`http://127.0.0.1:8000/api/entreprise/${id}/modifier/`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${authTokens?.access}`,
-                    'Content-Type': 'application/json'
+                    // Note: Ne définissez pas 'Content-Type' ici, car fetch le gère pour FormData.
                 },
-                body: JSON.stringify(updatedData),
+                body: formData,
             });
 
+            // Vérifiez si la réponse est une erreur d'authentification (401)
             if (response.status === 401) {
-                await updateToken();
+                await updateToken();  // Rafraîchir le token
                 response = await fetch(`http://127.0.0.1:8000/api/entreprise/${id}/modifier/`, {
                     method: 'PUT',
                     headers: {
                         'Authorization': `Bearer ${authTokens?.access}`,
-                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(updatedData),
+                    body: formData, // Renvoie le formData pour la seconde tentative
                 });
             }
 
-            if (response.ok) {
-                navigate(`/entreprise/${id}`); // Redirige vers la liste des entreprises
-            } else {
-                const data = await response.json();
-                console.error('Error:', data);
-                alert(data.detail || 'Une erreur est survenue lors de la mise à jour des informations.');
+            // Vérifiez la réponse
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Erreur:', errorData);
+                throw new Error('Erreur lors de la mise à jour de l\'entreprise');
             }
+
+            const data = await response.json();
+            console.log('Données mises à jour:', data);
+            // Gérer la redirection ou notification ici
+
         } catch (error) {
-            console.error('Erreur lors de la mise à jour de l\'entreprise', error);
+            console.error('Erreur:', error);
+            // Affichez une notification à l'utilisateur si nécessaire
         }
     };
+
 
     const handleLogoChange = (e) => {
         const file = e.target.files[0];
@@ -188,42 +174,6 @@ const InfoEntrepriseEdit = () => {
         });
     };
 
-    const handleModifierUtilisateur = (utilisateur) => {
-        setUtilisateurModif(utilisateur); // Pré-remplir le formulaire de modification
-    };
-
-    const handleSubmitUtilisateurModif = async (e) => {
-        e.preventDefault();
-
-        // Ici, vous devez préparer les données pour la mise à jour de l'utilisateur
-        const updatedUserData = {
-            // Ajoutez ici les champs que vous souhaitez mettre à jour
-            // par exemple: nom: utilisateurModif.nom, email: utilisateurModif.email, etc.
-        };
-
-        try {
-            let response = await fetch(`http://127.0.0.1:8000/api/utilisateur/${utilisateurModif.id}/modifier/`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${authTokens?.access}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(updatedUserData),
-            });
-
-            if (response.ok) {
-                setUtilisateurModif(null); // Réinitialiser l'utilisateur à modifier
-                window.location.reload(); // Rafraîchir la page pour voir les modifications
-            } else {
-                const data = await response.json();
-                console.error('Error:', data);
-                alert(data.detail || 'Une erreur est survenue lors de la mise à jour de l\'utilisateur.');
-            }
-        } catch (error) {
-            console.error('Erreur lors de la mise à jour de l\'utilisateur', error);
-        }
-    };
-
     return (
         <div className="global-1"> {/* Élément parent englobant tout le JSX */}
             <div className="contenu-1">
@@ -253,66 +203,39 @@ const InfoEntrepriseEdit = () => {
                 </div>
                 <form onSubmit={handleSubmitInfo}>
                     <div className="entreprise-info">
-                        <div className="input-container">
-                            <img src={entreprise.logo} alt="Logo de l'entreprise" />
-                            <input
-                                type="text"
-                                name="nom_entreprise"
-                                value={entreprise.nom_entreprise}
-                                onChange={handleChange}
-                                placeholder="Nom de l'entreprise"
-                                required
-                            />
+                        <div className="input-container no-icon">
+                            <input type="text" name="nom_entreprise"  onChange={handleEntrepriseChange} value={entreprise.nom_entreprise} />
+                            <label>Nom de l'entreprise :</label>
                         </div>
                         <div className="input-container">
-                            <input
-                                type="text"
-                                name="nif"
-                                value={entreprise.nif}
-                                onChange={handleChange}
-                                placeholder="NIF"
-                                required
-                            />
+                            <i className="fas fa-id-card"></i>
+                            <input type="text" name="nif" onChange={handleEntrepriseChange} value={entreprise.nif} />
+                            <label>NIF :</label>
                         </div>
                         <div className="input-container">
-                            <input
-                                type="text"
-                                name="stat"
-                                value={entreprise.stat}
-                                onChange={handleChange}
-                                placeholder="STAT"
-                                required
-                            />
+                            <i className="fas fa-file-alt"></i>
+                            <input type="text" name="stat" onChange={handleEntrepriseChange} value={entreprise.stat} />
+                            <label>Stat :</label>
                         </div>
                         <div className="input-container">
-                            <input
-                                type="text"
-                                name="contact"
-                                value={entreprise.contact}
-                                onChange={handleChange}
-                                placeholder="Contact"
-                                required
-                            />
+                            <i className="fas fa-phone"></i>
+                            <input type="text" name="contact" onChange={handleEntrepriseChange} value={entreprise.contact} />
+                            <label>Contact :</label>
                         </div>
                         <div className="input-container">
-                            <input
-                                type="text"
-                                name="localisation"
-                                value={entreprise.localisation}
-                                onChange={handleChange}
-                                placeholder="Localisation"
-                                required
-                            />
+                            <i className="fas fa-map-marker-alt"></i>
+                            <input type="text" name="localisation" onChange={handleEntrepriseChange} value={entreprise.localisation} />
+                            <label>Localisation :</label>
                         </div>
                         <div className="input-container">
-                            <input
-                                type="text"
-                                name="proprio"
-                                value={entreprise.proprio}
-                                onChange={handleChange}
-                                placeholder="Propriétaire"
-                                required
-                            />
+                            <i className="fas fa-user-tie"></i>
+                            <input type="text" name="proprio" onChange={handleEntrepriseChange} value={entreprise.proprio} />
+                            <label>Propriétaire :</label>
+                        </div>
+                        <div className="ajust">
+                            <Link to={`/entreprise-list`}>
+                                <button className="retour">Retour</button>
+                            </Link>
                         </div>
                     </div>
                     <div className="button-container">
@@ -321,47 +244,242 @@ const InfoEntrepriseEdit = () => {
                 </form>
             </div>
             {/* Section pour afficher et modifier les utilisateurs */}
-            <div className="utilisateurs-container">
-                <h2>Utilisateurs associés</h2>
-                <ul>
-                    {utilisateurs.map((utilisateur) => (
-                        <li key={utilisateur.id}>
-                            {utilisateur.nom} - {utilisateur.email}
-                            <button onClick={() => handleModifierUtilisateur(utilisateur)}>Modifier</button>
-                        </li>
-                    ))}
-                </ul>
-
-                {utilisateurModif && (
-                    <div className="modif-utilisateur">
-                        <h3>Modifier l'utilisateur</h3>
-                        <form onSubmit={handleSubmitUtilisateurModif}>
-                            <input
-                                type="text"
-                                name="nom"
-                                value={utilisateurModif.nom}
-                                onChange={(e) => setUtilisateurModif({ ...utilisateurModif, nom: e.target.value })}
-                                placeholder="Nom"
-                                required
-                            />
-                            <input
-                                type="email"
-                                name="email"
-                                value={utilisateurModif.email}
-                                onChange={(e) => setUtilisateurModif({ ...utilisateurModif, email: e.target.value })}
-                                placeholder="Email"
-                                required
-                            />
-                            <div className="button-container">
-                                <button type="submit">Enregistrer</button>
-                                <button type="button" onClick={() => setUtilisateurModif(null)}>Annuler</button>
-                            </div>
-                        </form>
-                    </div>
-                )}
-            </div>
+            <h2>Informations de l'Utilisateur</h2>
+            <label>
+                Nom:
+                <input
+                    type="text"
+                    name="nom"
+                    value={entreprise.user.nom}
+                    onChange={handleUserChange}
+                />
+            </label>
+            <label>
+                Email:
+                <input
+                    type="email"
+                    name="email"
+                    value={entreprise.user.email}
+                    onChange={handleUserChange}
+                />
+            </label>
+            <label>
+                <img src={entreprise.user.photo} alt="Logo de l'entreprise" style={{ width: '100px', height: 'auto', borderRadius: "50%" }} />
+                <input
+                    type="file"
+                    name="photo"
+                    onChange={handleUserChange}
+                />
+            </label>
         </div>
     );
 };
 
 export default InfoEntrepriseEdit;
+
+// import React, { useState, useEffect, useContext } from 'react';
+// import { useParams } from 'react-router-dom';
+// import AuthContext from '../context/AuthContext';
+
+// function InfoEntrepriseEdit() {
+//     const { id } = useParams(); // Récupère l'ID depuis l'URL
+//     const { authTokens, updateToken } = useContext(AuthContext);
+//     const [entreprise, setEntreprise] = useState({
+//         nom_entreprise: '',
+//         nif: '',
+//         stat: '',
+//         contact: '',
+//         localisation: '',
+//         proprio: '',
+//         user: {
+//             nom: '',
+//             email: '',
+//             photo: '',
+//         },
+//     });
+
+//     useEffect(() => {
+//         const fetchEntreprise = async () => {
+//             try {
+//                 const response = await fetch(`http://127.0.0.1:8000/api/entreprise/${id}/`);
+//                 if (!response.ok) {
+//                     throw new Error('Erreur lors de la récupération des données');
+//                 }
+//                 const data = await response.json();
+//                 setEntreprise(data);
+//             } catch (error) {
+//                 console.error('Erreur:', error);
+//             }
+//         };
+
+//         fetchEntreprise();
+//     }, [id]);
+
+//     const handleEntrepriseChange = (e) => {
+//         const { name, value } = e.target;
+//         setEntreprise((prev) => ({ ...prev, [name]: value }));
+//     };
+
+//     const handleUserChange = (e) => {
+//         const { name, value } = e.target;
+//         setEntreprise((prev) => ({
+//             ...prev,
+//             user: { ...prev.user, [name]: value },
+//         }));
+//     };
+
+//     const handleSubmit = async (e) => {
+//         e.preventDefault();
+//         const formData = new FormData();
+
+//         // Ajoutez les informations de l'entreprise au FormData
+//         formData.append('nom_entreprise', entreprise.nom_entreprise);
+//         formData.append('nif', entreprise.nif);
+//         formData.append('stat', entreprise.stat);
+//         formData.append('contact', entreprise.contact);
+//         formData.append('localisation', entreprise.localisation);
+//         formData.append('proprio', entreprise.proprio);
+//         formData.append('user', entreprise.user.id); // ID de l'utilisateur
+
+//         // Ajoutez les données utilisateur
+//         formData.append('user.nom', entreprise.user.nom);
+//         formData.append('user.email', entreprise.user.email);
+
+//         // Vérifiez que la photo est bien un fichier avant de l'ajouter
+//         if (entreprise.user.photo && entreprise.user.photo instanceof File) {
+//             formData.append('user.photo', entreprise.user.photo);
+//         }
+
+//         try {
+//             let response = await fetch(`http://127.0.0.1:8000/api/entreprise/${id}/modifier/`, {
+//                 method: 'PUT',
+//                 headers: {
+//                     'Authorization': `Bearer ${authTokens?.access}`,
+//                     // Note: Ne définissez pas 'Content-Type' ici, car fetch le gère pour FormData.
+//                 },
+//                 body: formData,
+//             });
+
+//             // Vérifiez si la réponse est une erreur d'authentification (401)
+//             if (response.status === 401) {
+//                 await updateToken();  // Rafraîchir le token
+//                 response = await fetch(`http://127.0.0.1:8000/api/entreprise/${id}/modifier/`, {
+//                     method: 'PUT',
+//                     headers: {
+//                         'Authorization': `Bearer ${authTokens?.access}`,
+//                     },
+//                     body: formData, // Renvoie le formData pour la seconde tentative
+//                 });
+//             }
+
+//             // Vérifiez la réponse
+//             if (!response.ok) {
+//                 const errorData = await response.json();
+//                 console.error('Erreur:', errorData);
+//                 throw new Error('Erreur lors de la mise à jour de l\'entreprise');
+//             }
+
+//             const data = await response.json();
+//             console.log('Données mises à jour:', data);
+//             // Gérer la redirection ou notification ici
+
+//         } catch (error) {
+//             console.error('Erreur:', error);
+//             // Affichez une notification à l'utilisateur si nécessaire
+//         }
+//     };
+
+
+//     return (
+//         <form onSubmit={handleSubmit}>
+//             <h2>Informations de l'Entreprise</h2>
+//             <img src={entreprise.logo} alt="Logo de l'entreprise" />
+//             <label>
+//                 Nom de l'entreprise:
+//                 <input
+//                     type="text"
+//                     name="nom_entreprise"
+//                     value={entreprise.nom_entreprise}
+//                     onChange={handleEntrepriseChange}
+//                 />
+//             </label>
+//             <label>
+//                 NIF:
+//                 <input
+//                     type="text"
+//                     name="nif"
+//                     value={entreprise.nif}
+//                     onChange={handleEntrepriseChange}
+//                 />
+//             </label>
+//             <label>
+//                 Stat:
+//                 <input
+//                     type="text"
+//                     name="stat"
+//                     value={entreprise.stat}
+//                     onChange={handleEntrepriseChange}
+//                 />
+//             </label>
+//             <label>
+//                 Contact:
+//                 <input
+//                     type="text"
+//                     name="contact"
+//                     value={entreprise.contact}
+//                     onChange={handleEntrepriseChange}
+//                 />
+//             </label>
+//             <label>
+//                 Localisation:
+//                 <input
+//                     type="text"
+//                     name="localisation"
+//                     value={entreprise.localisation}
+//                     onChange={handleEntrepriseChange}
+//                 />
+//             </label>
+//             <label>
+//                 Propriétaire:
+//                 <input
+//                     type="text"
+//                     name="proprio"
+//                     value={entreprise.proprio}
+//                     onChange={handleEntrepriseChange}
+//                 />
+//             </label>
+
+//             <h2>Informations de l'Utilisateur</h2>
+//             <label>
+//                 Nom:
+//                 <input
+//                     type="text"
+//                     name="nom"
+//                     value={entreprise.user.nom}
+//                     onChange={handleUserChange}
+//                 />
+//             </label>
+//             <label>
+//                 Email:
+//                 <input
+//                     type="email"
+//                     name="email"
+//                     value={entreprise.user.email}
+//                     onChange={handleUserChange}
+//                 />
+//             </label>
+//             <label>
+//                 <img src={entreprise.user.photo} alt="Logo de l'entreprise" style={{ width: '100px', height: 'auto', borderRadius: "50%" }} />
+//                 <input
+//                     type="file"
+//                     name="photo"
+//                     onChange={handleUserChange}
+//                 />
+//             </label>
+
+//             <button type="submit">Soumettre</button>
+//         </form>
+//     );
+// }
+
+// export default InfoEntrepriseEdit;
