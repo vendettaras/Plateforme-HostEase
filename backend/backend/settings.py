@@ -35,6 +35,8 @@ INSTALLED_APPS = [
     "corsheaders",
 
     'hostease.apps.HosteaseConfig',
+
+    'django_extensions',
 ]
 
 

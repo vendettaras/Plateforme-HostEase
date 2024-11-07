@@ -1,14 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils import timezone
+from datetime import timedelta
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, nom, password=None, role='entreprise', photo=None):
+    def create_user(self, email, nom, password=None, is_active=True, role='entreprise', photo=None):
         if not email:
             raise ValueError("Les utilisateurs doivent avoir une adresse e-mail.")
-        user = self.model(email=email, nom=nom, role=role, photo=photo)
+        user = self.model(email=email, nom=nom, is_active=is_active, role=role, photo=photo)
         user.set_password(password)  # Utilise la méthode pour hacher le mot de passe
+        user.is_active = True
+        print("is_active avant sauvegarde:", user.is_active)  # Débogage
         user.save(using=self._db)
+        print("is_active après sauvegarde:", user.is_active)  # Débogage
         return user
 
     def create_superuser(self, email, nom, password, photo=None):
@@ -84,3 +88,17 @@ class Bdd(models.Model):
 
     def __str__(self):
         return self.lien
+
+def one_year_from_now():
+    return timezone.now() + timedelta(days=365)
+
+class OffreEntreprise(models.Model) :
+    entreprise = models.OneToOneField(InfoEntreprise, on_delete=models.CASCADE, related_name='offre_entreprise')
+    offre = models.ForeignKey(Offre, on_delete=models.CASCADE, related_name='entreprise_offre')
+    date_begin = models.DateTimeField(default=timezone.now)
+    date_exp = models.DateTimeField(default=one_year_from_now)
+    ref_payement = models.CharField(max_length=30, null=True)
+    motif_payement = models.CharField(max_length=30, null=True)
+
+    def __str__(self):
+        return self.entreprise

@@ -14,7 +14,9 @@ from .views import (
     InfoEntrepriseList,
     EntrepriseDetailView,
     ProfileView,
-    EntrepriseListForUser
+    EntrepriseListForUser,
+    PaiementView,
+    OffreEntrepriseList,
     )
 
 urlpatterns = [
@@ -47,5 +49,9 @@ urlpatterns = [
     path('offre/<int:pk>/', OffreDetailView.as_view(), name='offre-detail'),
     path('offre/<int:pk>/modifier/', OffreUpdateView.as_view(), name='offre-update'),
     path('offre/<int:pk>/delete/', OffreDeleteView.as_view(), name='offre-delete'),
+
+    # OFFRE_ENTREPRISE ,
+    path('paiement/', PaiementView.as_view(), name='paiement'),
+    path('gestion-utilisateur/', OffreEntrepriseList.as_view(), name='utilisateur-list'),
 
 ]

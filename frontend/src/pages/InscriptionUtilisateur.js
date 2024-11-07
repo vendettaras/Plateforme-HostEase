@@ -6,7 +6,6 @@ const InscriptionUtilisateur = ({ onUserCreated }) => {
   const [password, setPassword] = useState('');
   const [photo, setPhoto] = useState(null);
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -14,12 +13,13 @@ const InscriptionUtilisateur = ({ onUserCreated }) => {
     formData.append('email', email);
     formData.append('nom', nom);
     formData.append('password', password);
+    formData.append('is_active', 'true');
     if (photo) {
       formData.append('photo', photo);
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/register-user/", {
+      const response = await fetch("http://127.0.0.1:8000/api/register-user/", {  // Remplacez l'URL par celle appropriée pour créer un utilisateur
         method: "POST",
         body: formData,
       });
@@ -27,7 +27,7 @@ const InscriptionUtilisateur = ({ onUserCreated }) => {
       if (response.ok) {
         const data = await response.json();
         console.log("Utilisateur créé avec succès", data);
-        onUserCreated(data.id);
+        onUserCreated(data.id);  // Récupérez l'ID de l'utilisateur créé et passez-le à `onUserCreated`
       } else {
         const errorData = await response.json();
         console.error("Erreur lors de la création de l'utilisateur:", errorData);
@@ -36,7 +36,6 @@ const InscriptionUtilisateur = ({ onUserCreated }) => {
       console.error("Erreur:", error);
     }
   };
-
 
   return (
     <form onSubmit={handleSubmit}>

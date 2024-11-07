@@ -5,7 +5,7 @@ import AuthContext from '../context/AuthContext';
 const OffreDetail = () => {
     const { id } = useParams(); // Récupère l'ID depuis l'URL
     const navigate = useNavigate();
-    const { isAdmin } = useContext(AuthContext); // Récupère les tokens d'authentification et l'utilisateur
+    const { isAdmin, user } = useContext(AuthContext); // Récupère l'utilisateur authentifié et ses informations
     const [offre, setOffre] = useState(null);
 
     useEffect(() => {
@@ -25,6 +25,17 @@ const OffreDetail = () => {
 
         fetchOffre();
     }, [id]);
+
+    const handlePaymentRedirect = () => {
+        if (!user || !user.id) {
+            console.error('Utilisateur non authentifié');
+            return; // Redirigez vers la page de connexion si nécessaire
+        }
+    
+        // Redirection vers la page de paiement (sans passer d'ID utilisateur)
+        navigate(`/paiement/${offre.id}`);
+    }; 
+    
 
     const handleEdit = () => {
         navigate(`/offre/${id}/modifier/`);
@@ -51,17 +62,18 @@ const OffreDetail = () => {
                 </span>
                 <span className="">{offre.description}</span>
             </p>
-            <hr class="custom-line" />
+            <hr className="custom-line" />
             <p className="offre">
                 <span className="prix-offre">{offre.prix} $</span>
                 <span className="mois"> /mois</span>
             </p>
             <p>
                 {isAdmin && (
-                    <>
-                        <button onClick={handleEdit}>Modifier</button>
-                    </>
+                    <button onClick={handleEdit}>Modifier</button>
                 )}
+            </p>
+            <p>
+                <button onClick={() => handlePaymentRedirect(offre.id)}>Adopter l'offre</button>
             </p>
         </div>
     );

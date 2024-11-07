@@ -11,17 +11,22 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 import logging
+import json
 
 from .serializers import (
     InfoEntrepriseSerializer, 
+    InfoEntrepriseInscriptionSerializer, 
     OffreSerializer, 
     CustomTokenObtainPairSerializer,
     CustomUserSerializer,
+    OffreEntrepriseSerializer,
+    OffreEntreprisePaiementSerializer,
     )
 from hostease.models import (
     CustomUser, 
     InfoEntreprise, 
     Offre,
+    OffreEntreprise,
   )  
 
 class IsOwner(BasePermission):
@@ -67,7 +72,7 @@ class InscriptionEntrepriseView(APIView):
 
         # Associe l'utilisateur à l'entreprise dans InfoEntreprise
         request.data['user'] = user.id  # Associe l'utilisateur à l'entreprise
-        serializer = InfoEntrepriseSerializer(data=request.data)
+        serializer = InfoEntrepriseInscriptionSerializer(data=request.data)
         if serializer.is_valid():
             entreprise = serializer.save()
             return Response({
@@ -101,7 +106,6 @@ class EntrepriseListForUser(ListAPIView):
 
 # -----------------------------------------Entreprise------------------------------------------
 
-
 class InfoEntrepriseUpdateView(RetrieveUpdateAPIView):
     queryset = InfoEntreprise.objects.all()
     serializer_class = InfoEntrepriseSerializer
@@ -115,16 +119,41 @@ class InfoEntrepriseUpdateView(RetrieveUpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         logger = logging.getLogger(__name__)
-        data = request.data.copy()
-        data['user'] = request.user.id
+        logger.info(f"Update request received with data: {request.data}")
+        
+        instance = self.get_object()  # Instance de InfoEntreprise
+        user = instance.user  # L'utilisateur associé
 
-        serializer = self.get_serializer(instance=self.get_object(), data=data)
+        # Extraire les données utilisateur de `user_data`
+        user_data = request.data.get('user', {})
+        if isinstance(user_data, str):
+            try:
+                user_data = json.loads(user_data)
+            except json.JSONDecodeError:
+                logger.error("Invalid JSON format for user data.")
+                return Response({"error": "Invalid JSON format for user."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Mettre à jour la photo de l'utilisateur si elle est dans la requête
+        if 'photo' in request.FILES:
+            user.photo = request.FILES['photo']  # Assigne le fichier photo à l'utilisateur
+
+        # Mettre à jour les champs utilisateur avec les données de `user_data`
+        for attr, value in user_data.items():
+            if hasattr(user, attr):
+                setattr(user, attr, value)
+        user.save()  # Sauvegarde définitive des modifications de l'utilisateur
+
+        # Initialiser le sérialiseur pour l'instance actuelle avec des données partielles
+        serializer = self.get_serializer(instance=instance, data=request.data, partial=True)
 
         if not serializer.is_valid():
-            logger.error(f"Validation errors: {serializer.errors}")  # Journalisez les erreurs de validation
+            logger.error(f"Validation errors: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        # Mettre à jour l'instance de l'entreprise
         self.perform_update(serializer)
+
+        logger.info(f"Update successful for InfoEntreprise with ID {instance.id}")
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -214,6 +243,34 @@ class OffreDeleteView(DestroyAPIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Offre.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        
+#_________________________________OFFRE_ENTREPRISE_____________________________________
+
+class PaiementView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = OffreEntreprisePaiementSerializer(data=request.data)
+        if serializer.is_valid():
+            offreEntreprise = serializer.save()  # Enregistre le paiement
+            return Response({
+                "id": offreEntreprise.id,  # Retourne l'ID du paiement
+                "message": "Paiement créé avec succès"
+            }, status=status.HTTP_201_CREATED)
+        
+        # Retourne les erreurs de validation pour comprendre le problème
+        return Response({
+            "errors": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+class OffreEntrepriseList(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        offreEntreprises = OffreEntreprise.objects.all()
+        serializer = OffreEntrepriseSerializer(offreEntreprises, many=True)
+        return Response(serializer.data)
+
 
 
 @api_view(['GET'])

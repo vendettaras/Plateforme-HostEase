@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+import AuthContext from '../context/AuthContext';
 
 const InscriptionEntreprise = ({ userId }) => {
   const [nomEntreprise, setNomEntreprise] = useState('');
@@ -11,6 +13,7 @@ const InscriptionEntreprise = ({ userId }) => {
   const [logo, setLogo] = useState(null);
 
   const navigate = useNavigate();
+  const { setAuthTokens, setUser } = useContext(AuthContext);  // Assurez-vous que ces valeurs sont bien obtenues
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +26,7 @@ const InscriptionEntreprise = ({ userId }) => {
     formData.append("localisation", localisation);
     formData.append("proprio", proprio);
     formData.append("logo", logo);
-    formData.append("user_id", userId);  // Ajouter l'ID utilisateur ici
+    formData.append("user_id", userId);
 
     try {
       const response = await fetch("http://127.0.0.1:8000/api/register-entreprise/", {
@@ -35,7 +38,18 @@ const InscriptionEntreprise = ({ userId }) => {
         const data = await response.json();
         console.error("Erreur lors de la création de l'entreprise:", data);
       } else {
-        console.log("Entreprise créée avec succès");
+        const data = await response.json();
+        const authToken = data.authToken;  // Assurez-vous que le backend renvoie le token
+
+        // Mettre à jour le contexte avec les nouveaux tokens
+        setAuthTokens({ access: authToken });
+        setUser(jwtDecode(authToken));  // Mettre à jour l'utilisateur avec le token
+
+        // Sauvegarder les tokens dans localStorage
+        localStorage.setItem('authTokens', JSON.stringify({ access: authToken }));
+
+        // Rediriger vers la page d'accueil
+        console.log("Entreprise créée avec succès, redirection...");
         navigate('/');
       }
     } catch (error) {

@@ -16,7 +16,8 @@ import InfoEntrepriseEdit from './pages/InfoEntrepriseEdit';
 import EntrepriseList from './pages/EntrepriseList';
 import EntrepriseDetail from './pages/EntrepriseDetail';
 import OffreDetail from './pages/OffreDetail';
-// import Profile from './pages/Profile';
+import Paiement from './pages/Paiement';
+import GestionUser from './pages/GestionUser';
 
 
 function App() {
@@ -37,7 +38,8 @@ function App() {
               <Route path="/entreprise-list" element={<EntrepriseList />} />
               <Route path="/entreprise/:id" element={<EntrepriseDetail />} />
               <Route path="/offre/:id" element={<OffreDetail />} />
-              {/* <Route path="/user/:id" element={<Profile />} /> */}
+              <Route path="/paiement/:offreId" element={<Paiement />} />
+              <Route path="/gestion-user/" element={<GestionUser />} />
             </Routes>
           </AuthProvider>
         </Router>

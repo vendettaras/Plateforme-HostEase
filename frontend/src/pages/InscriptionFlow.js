@@ -21,3 +21,4 @@ const InscriptionFlow = () => {
 };
 
 export default InscriptionFlow;
+

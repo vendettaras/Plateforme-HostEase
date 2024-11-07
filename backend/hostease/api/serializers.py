@@ -1,36 +1,69 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from hostease.models import InfoEntreprise, Offre, CustomUser
+from hostease.models import InfoEntreprise, Offre, CustomUser, OffreEntreprise
 
 from django.utils import timezone
 from backend import settings
 
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
+        # Obtenez le token de base
         token = super().get_token(user)
 
         # Ajoutez des informations supplémentaires au token
         token['role'] = user.role  # Ajoute le rôle de l'utilisateur au token
         token['email'] = user.email  # Ajoute l'email de l'utilisateur au token
         token['nom'] = user.nom  # Ajoute le nom de l'utilisateur au token
-        token['is_staff'] = user.is_staff
-        token['id'] = user.id
-        token['photo'] = user.photo.url if user.photo else None
+        token['is_staff'] = user.is_staff  # Ajoute l'état "is_staff" au token
+        token['id'] = user.id  # Ajoute l'ID de l'utilisateur au token
+        token['photo'] = user.photo.url if user.photo else None  # Ajoute l'URL de la photo (si elle existe)
+
+        try:
+            # Trouver l'entreprise associée à l'utilisateur
+            entreprise = InfoEntreprise.objects.get(user=user)
+            token['entreprise_id'] = entreprise.id  # Ajoute l'ID de l'entreprise au token
+        except InfoEntreprise.DoesNotExist:
+            token['entreprise_id'] = None  # Si l'entreprise n'existe pas, mettre à None
 
         return token
+
 
 class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser  # Remplacez par votre modèle d’utilisateur
-        fields = ['id', 'nom', 'email', 'photo']  # Champs que vous voulez permettre de modifier
+        fields = '__all__'  # Champs que vous voulez permettre de modifier
         extra_kwargs = {
-            'id': {'read_only': True}
+            'id': {'read_only': True},
         }
+
+    def create(self, validated_data):
+        # Récupérer le mot de passe pour le hacher
+        password = validated_data.pop('password')
+
+        # Créez un utilisateur en utilisant les données validées (sans le mot de passe pour l'instant)
+        user = get_user_model().objects.create(**validated_data)
+
+        # Hachez le mot de passe
+        user.set_password(password)
+
+        # Enregistrez l'utilisateur après avoir haché le mot de passe
+        user.save()
+
+        return user
+    
+class InfoEntrepriseInscriptionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = InfoEntreprise
+        fields = '__all__'
 
 
 class InfoEntrepriseSerializer(serializers.ModelSerializer):
@@ -70,10 +103,28 @@ class InfoEntrepriseSerializer(serializers.ModelSerializer):
 
         return instance
 
-
-
 class OffreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offre
         fields = ['id', 'nom_offre', 'prix', 'description']
+
+class OffreEntreprisePaiementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OffreEntreprise
+        fields = '__all__'
+        extra_kwargs = {
+            'date_begin': {'read_only': True},
+            'date_exp' : {'read_only': True}
+        }
+
+class OffreEntrepriseSerializer(serializers.ModelSerializer):
+    entreprise = InfoEntrepriseSerializer(read_only=False)  # Changez en False si vous voulez mettre à jour aussi
+    offre = OffreSerializer(read_only=False)  # Changez en False si vous voulez mettre à jour aussi
+    class Meta:
+        model = OffreEntreprise
+        fields = '__all__'
+        extra_kwargs = {
+            'date_begin': {'read_only': True},
+            'date_exp' : {'read_only': True},
+        }
 
